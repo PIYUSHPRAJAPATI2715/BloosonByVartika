@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Box, Image as ImageIcon, Tag, Sparkles, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Box, Image as ImageIcon, Tag, Sparkles, CheckCircle2, RefreshCw, Link, Grid } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function AdminProducts() {
@@ -32,6 +32,16 @@ export default function AdminProducts() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [imageTab, setImageTab] = useState('url'); // 'url' or 'gallery'
+
+  const presetGalleryImages = [
+    { label: 'Royal Blush Trousseau', url: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600' },
+    { label: 'Gold Shagun Tray', url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600' },
+    { label: 'Festive Gold Trunk', url: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&q=80&w=600' },
+    { label: 'Pastel Baby Chest', url: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=600' },
+    { label: 'Explosion Memory Box', url: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600' },
+    { label: 'Executive Leather Kit', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=600' }
+  ];
 
   const generateSku = () => `BV-PROD-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -160,7 +170,7 @@ export default function AdminProducts() {
             Product Catalog & Inventory Manager
           </h1>
           <p style={{ color: '#AAA', fontSize: '0.88rem' }}>
-            Add, edit, or remove luxury hampers, manage stock, and update image URLs live.
+            Add, edit, or remove luxury hampers, select images via URL or Gallery, and manage stock.
           </p>
         </div>
 
@@ -226,7 +236,7 @@ export default function AdminProducts() {
       {/* Add / Edit Product Modal */}
       {(showAddModal || showEditModal) && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#282828', borderRadius: '24px', padding: '32px', maxWidth: '640px', width: '100%', border: '2px solid #C8A45D', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#282828', borderRadius: '24px', padding: '32px', maxWidth: '660px', width: '100%', border: '2px solid #C8A45D', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.5rem', marginBottom: '18px' }}>
               {showEditModal ? '✏️ Edit Luxury Product' : '👑 Add New Luxury Product'}
             </h3>
@@ -263,15 +273,93 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {/* Image URL & Thumbnail Preview */}
-              <div>
-                <label style={{ fontSize: '0.82rem', color: '#C8A45D', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Product Image URL *</label>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <input type="text" required value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://images.unsplash.com/..." style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
-                  {formData.imageUrl && (
-                    <img src={formData.imageUrl} alt="Preview" style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #C8A45D' }} />
-                  )}
+              {/* DUAL IMAGE SELECTOR: Direct URL OR Preset Gallery */}
+              <div style={{ background: '#1E1E1E', borderRadius: '16px', padding: '16px', border: '1px solid rgba(200, 164, 93, 0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <label style={{ fontSize: '0.82rem', color: '#C8A45D', fontWeight: 700 }}>Select Product Image</label>
+                  <div style={{ display: 'flex', gap: '6px', background: '#282828', padding: '2px', borderRadius: '20px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => setImageTab('url')}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '16px',
+                        border: 'none',
+                        background: imageTab === 'url' ? '#C8A45D' : 'transparent',
+                        color: imageTab === 'url' ? '#1E1E1E' : '#AAA',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Link size={12} /> Direct URL
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setImageTab('gallery')}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '16px',
+                        border: 'none',
+                        background: imageTab === 'gallery' ? '#C8A45D' : 'transparent',
+                        color: imageTab === 'gallery' ? '#1E1E1E' : '#AAA',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Grid size={12} /> Preset Gallery
+                    </button>
+                  </div>
                 </div>
+
+                {imageTab === 'url' ? (
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <input 
+                      type="text" 
+                      required 
+                      value={formData.imageUrl} 
+                      onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
+                      placeholder="Paste Image URL (https://...)" 
+                      style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', outline: 'none', fontSize: '0.85rem' }} 
+                    />
+                    {formData.imageUrl && (
+                      <img src={formData.imageUrl} alt="Preview" style={{ width: '44px', height: '44px', borderRadius: '8px', objectFit: 'cover', border: '1.5px solid #C8A45D' }} />
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
+                      {presetGalleryImages.map((imgItem) => (
+                        <div 
+                          key={imgItem.url}
+                          onClick={() => setFormData({...formData, imageUrl: imgItem.url})}
+                          style={{
+                            borderRadius: '10px',
+                            overflow: 'hidden',
+                            border: formData.imageUrl === imgItem.url ? '2px solid #C8A45D' : '1px solid #444',
+                            cursor: 'pointer',
+                            position: 'relative',
+                            height: '70px'
+                          }}
+                        >
+                          <img src={imgItem.url} alt={imgItem.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          {formData.imageUrl === imgItem.url && (
+                            <div style={{ position: 'absolute', inset: 0, background: 'rgba(200,164,93,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <CheckCircle2 size={18} color="#FFF" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Pricing & Stock */}
