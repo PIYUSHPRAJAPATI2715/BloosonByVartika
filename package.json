@@ -4,13 +4,13 @@
   "description": "Blossom by Vartika Luxury Storefront, Admin Panel & Node.js API",
   "main": "server/server.js",
   "scripts": {
-    "build": "cd server && npm install",
+    "build": "cd client && npm install && npm run build",
     "start": "cd server && npm start",
     "server": "cd server && npm start",
     "client": "cd client && npm run dev",
     "seed": "cd server && npm run seed"
   },
-  "keywords": ["luxury", "gifting", "jaipur", "mongodb", "render"],
+  "keywords": ["luxury", "gifting", "jaipur", "mongodb", "vercel", "render"],
   "author": "Vartika Gupta",
   "license": "MIT"
 }
