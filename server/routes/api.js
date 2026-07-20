@@ -157,9 +157,22 @@ router.get('/products/:id', async (req, res) => {
 
 router.post('/products', async (req, res) => {
   try {
-    const newProduct = await Product.create(req.body);
+    const { name, sku, category, price, discountPrice, stock, images, description } = req.body;
+    const autoSku = (sku && typeof sku === 'string' && sku.trim()) ? sku : `BV-PROD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const productPayload = {
+      name: name || "Luxury Gift Hamper",
+      sku: autoSku,
+      category: category || "Wedding Collection",
+      price: Number(price) || 4500,
+      discountPrice: discountPrice ? Number(discountPrice) : Number(price) || 3990,
+      stock: stock !== undefined ? Number(stock) : 10,
+      images: (Array.isArray(images) && images.length > 0) ? images : ["https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600"],
+      description: description || "Handcrafted luxury hamper with bespoke embellishments."
+    };
+    const newProduct = await Product.create(productPayload);
     res.status(201).json({ success: true, data: newProduct });
   } catch (err) {
+    console.error("Product create error:", err);
     res.status(400).json({ success: false, message: err.message });
   }
 });
