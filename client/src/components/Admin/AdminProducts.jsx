@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Box, Image as ImageIcon, Tag, Sparkles, CheckCircle2, RefreshCw, Link, Grid } from 'lucide-react';
+import { Plus, Edit, Trash2, Box, Image as ImageIcon, Tag, Sparkles, CheckCircle2, RefreshCw, Link, Upload, Grid } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function AdminProducts() {
@@ -32,7 +32,7 @@ export default function AdminProducts() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  const [imageTab, setImageTab] = useState('url'); // 'url' or 'gallery'
+  const [imageTab, setImageTab] = useState('upload'); // 'upload', 'url', 'preset'
 
   const presetGalleryImages = [
     { label: 'Royal Blush Trousseau', url: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600' },
@@ -65,6 +65,17 @@ export default function AdminProducts() {
       })
       .catch(err => console.warn("Admin products fallback:", err));
   }, []);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleOpenAdd = () => {
     setFormData({
@@ -110,7 +121,6 @@ export default function AdminProducts() {
     };
 
     if (showEditModal && formData._id) {
-      // EDIT PRODUCT
       setProducts(products.map(p => p._id === formData._id ? { ...p, ...payload } : p));
       setShowEditModal(false);
       try {
@@ -123,7 +133,6 @@ export default function AdminProducts() {
         console.warn("Product edit fallback:", err);
       }
     } else {
-      // ADD NEW PRODUCT
       try {
         const res = await fetch(getApiUrl('/api/products'), {
           method: 'POST',
@@ -170,7 +179,7 @@ export default function AdminProducts() {
             Product Catalog & Inventory Manager
           </h1>
           <p style={{ color: '#AAA', fontSize: '0.88rem' }}>
-            Add, edit, or remove luxury hampers, select images via URL or Gallery, and manage stock.
+            Add, edit, or remove luxury hampers, upload device photos, and manage live stock.
           </p>
         </div>
 
@@ -273,16 +282,35 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {/* DUAL IMAGE SELECTOR: Direct URL OR Preset Gallery */}
+              {/* IMAGE SELECTOR: 1. File Upload / Gallery File Picker, 2. Direct URL, 3. Presets */}
               <div style={{ background: '#1E1E1E', borderRadius: '16px', padding: '16px', border: '1px solid rgba(200, 164, 93, 0.3)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <label style={{ fontSize: '0.82rem', color: '#C8A45D', fontWeight: 700 }}>Select Product Image</label>
-                  <div style={{ display: 'flex', gap: '6px', background: '#282828', padding: '2px', borderRadius: '20px' }}>
+                  <label style={{ fontSize: '0.82rem', color: '#C8A45D', fontWeight: 700 }}>Select or Upload Product Image</label>
+                  <div style={{ display: 'flex', gap: '4px', background: '#282828', padding: '2px', borderRadius: '20px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => setImageTab('upload')}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '16px',
+                        border: 'none',
+                        background: imageTab === 'upload' ? '#C8A45D' : 'transparent',
+                        color: imageTab === 'upload' ? '#1E1E1E' : '#AAA',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Upload size={12} /> Device Gallery
+                    </button>
                     <button 
                       type="button" 
                       onClick={() => setImageTab('url')}
                       style={{
-                        padding: '4px 12px',
+                        padding: '4px 10px',
                         borderRadius: '16px',
                         border: 'none',
                         background: imageTab === 'url' ? '#C8A45D' : 'transparent',
@@ -295,17 +323,17 @@ export default function AdminProducts() {
                         gap: '4px'
                       }}
                     >
-                      <Link size={12} /> Direct URL
+                      <Link size={12} /> Image URL
                     </button>
                     <button 
                       type="button" 
-                      onClick={() => setImageTab('gallery')}
+                      onClick={() => setImageTab('preset')}
                       style={{
-                        padding: '4px 12px',
+                        padding: '4px 10px',
                         borderRadius: '16px',
                         border: 'none',
-                        background: imageTab === 'gallery' ? '#C8A45D' : 'transparent',
-                        color: imageTab === 'gallery' ? '#1E1E1E' : '#AAA',
+                        background: imageTab === 'preset' ? '#C8A45D' : 'transparent',
+                        color: imageTab === 'preset' ? '#1E1E1E' : '#AAA',
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -314,12 +342,43 @@ export default function AdminProducts() {
                         gap: '4px'
                       }}
                     >
-                      <Grid size={12} /> Preset Gallery
+                      <Grid size={12} /> Presets
                     </button>
                   </div>
                 </div>
 
-                {imageTab === 'url' ? (
+                {imageTab === 'upload' && (
+                  <div>
+                    <label 
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '20px',
+                        borderRadius: '12px',
+                        border: '2px dashed #C8A45D',
+                        background: '#282828',
+                        cursor: 'pointer',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <Upload size={28} color="#C8A45D" style={{ marginBottom: '8px' }} />
+                      <span style={{ fontSize: '0.85rem', color: '#FFF', fontWeight: 600 }}>Click to Upload Image from Computer / Phone Gallery</span>
+                      <span style={{ fontSize: '0.72rem', color: '#AAA', marginTop: '2px' }}>Supports PNG, JPG, WEBP (Instant Base64 conversion)</span>
+                      <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+                    </label>
+
+                    {formData.imageUrl && (
+                      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px', background: '#282828', padding: '8px 12px', borderRadius: '10px' }}>
+                        <img src={formData.imageUrl} alt="Uploaded Preview" style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #C8A45D' }} />
+                        <span style={{ fontSize: '0.8rem', color: '#4CAF50', fontWeight: 600 }}>✓ Image uploaded & selected!</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {imageTab === 'url' && (
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <input 
                       type="text" 
@@ -333,7 +392,9 @@ export default function AdminProducts() {
                       <img src={formData.imageUrl} alt="Preview" style={{ width: '44px', height: '44px', borderRadius: '8px', objectFit: 'cover', border: '1.5px solid #C8A45D' }} />
                     )}
                   </div>
-                ) : (
+                )}
+
+                {imageTab === 'preset' && (
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '10px' }}>
                       {presetGalleryImages.map((imgItem) => (
