@@ -10,6 +10,7 @@ import GiftQuizModal from './components/Storefront/GiftQuizModal';
 import TrousseauPlanner from './components/Storefront/TrousseauPlanner';
 import CustomOrderModal from './components/Storefront/CustomOrderModal';
 import OrderTrackerModal from './components/Storefront/OrderTrackerModal';
+import AllProductsModal from './components/Storefront/AllProductsModal';
 import CartDrawer from './components/Storefront/CartDrawer';
 import AuthModal from './components/Storefront/AuthModal';
 import Testimonials from './components/Storefront/Testimonials';
@@ -192,6 +193,7 @@ export default function App() {
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [isCustomOrderOpen, setIsCustomOrderOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
+  const [isAllProductsOpen, setIsAllProductsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Keyboard shortcut listener Ctrl + Alt + A for Admin login
@@ -374,6 +376,7 @@ export default function App() {
             onQuickView={(p) => setActiveQuickViewProduct(p)}
             onAddToCart={(p) => handleAddToCart(p, 'Standard', 1)}
             onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
+            onOpenAllProducts={() => setIsAllProductsOpen(true)}
           />
 
           <ProcessSection />
@@ -441,6 +444,15 @@ export default function App() {
           onClose={() => setIsOrderTrackerOpen(false)}
         />
       )}
+
+      <AllProductsModal
+        isOpen={isAllProductsOpen}
+        onClose={() => setIsAllProductsOpen(false)}
+        products={products}
+        onQuickView={(p) => setActiveQuickViewProduct(p)}
+        onAddToCart={handleAddToCart}
+        onOpenHamperBuilder={() => { setIsAllProductsOpen(false); setIsHamperBuilderOpen(true); }}
+      />
 
       <CartDrawer 
         cartItems={cartItems}

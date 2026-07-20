@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Eye, ShoppingBag, Heart, Filter, Check } from 'lucide-react';
 
-export default function ProductGallery({ products, selectedCategory, onSelectCategory, onQuickView, onAddToCart, onOpenHamperBuilder }) {
+export default function ProductGallery({ products, selectedCategory, onSelectCategory, onQuickView, onAddToCart, onOpenHamperBuilder, onOpenAllProducts }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
 
@@ -297,6 +297,17 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
               </div>
             );
           })}
+        </div>
+
+        {/* View All Products CTA */}
+        <div style={{ textAlign: 'center', marginTop: '48px' }}>
+          <button 
+            onClick={onOpenAllProducts}
+            className="btn-gold" 
+            style={{ padding: '14px 36px', fontSize: '0.95rem', borderRadius: '30px', boxShadow: '0 8px 24px rgba(200, 164, 93, 0.3)' }}
+          >
+            <Sparkles size={18} /> View All Products & Collections
+          </button>
         </div>
 
         {filteredProducts.length === 0 && (
