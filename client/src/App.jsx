@@ -209,6 +209,23 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Google Analytics Realtime Pageview Event Dispatcher
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('config', 'G-J290RKLB19', {
+        page_title: document.title,
+        page_location: window.location.href,
+        page_path: window.location.pathname
+      });
+      window.gtag('event', 'page_view', {
+        send_to: 'G-J290RKLB19',
+        page_title: document.title,
+        page_location: window.location.href,
+        page_path: window.location.pathname
+      });
+    }
+  }, [activeAdmin, isAllProductsOpen]);
+
   // Fetch products & website settings from REST API on mount
   useEffect(() => {
     fetch(getApiUrl('/api/products'))
