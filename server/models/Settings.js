@@ -12,4 +12,4 @@ const settingsSchema = new mongoose.Schema({
   whatsappNumber: { type: String, default: "919829000000" }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Settings', settingsSchema);
+module.exports = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);

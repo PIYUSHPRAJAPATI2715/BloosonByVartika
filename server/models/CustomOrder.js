@@ -21,4 +21,4 @@ const customOrderSchema = new mongoose.Schema({
   adminNotes: { type: String }
 }, { timestamps: true });
 
-module.exports = mongoose.model('CustomOrder', customOrderSchema);
+module.exports = mongoose.models.CustomOrder || mongoose.model('CustomOrder', customOrderSchema);
