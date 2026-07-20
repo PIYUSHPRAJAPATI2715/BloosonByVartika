@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
 const dotenv = require('dotenv');
 dotenv.config();
+
+if (dns.setServers) {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  } catch (e) {}
+}
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const Product = require('../models/Product');
 const Category = require('../models/Category');

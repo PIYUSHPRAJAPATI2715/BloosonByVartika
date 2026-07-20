@@ -11,6 +11,7 @@ import TrousseauPlanner from './components/Storefront/TrousseauPlanner';
 import CustomOrderModal from './components/Storefront/CustomOrderModal';
 import OrderTrackerModal from './components/Storefront/OrderTrackerModal';
 import CartDrawer from './components/Storefront/CartDrawer';
+import AuthModal from './components/Storefront/AuthModal';
 import Testimonials from './components/Storefront/Testimonials';
 import ProcessSection from './components/Storefront/ProcessSection';
 import InstagramFeed from './components/Storefront/InstagramFeed';
@@ -24,9 +25,11 @@ import AdminLayout from './components/Admin/AdminLayout';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminCustomOrders from './components/Admin/AdminCustomOrders';
 import AdminOrders from './components/Admin/AdminOrders';
+import AdminUsers from './components/Admin/AdminUsers';
 import AdminProducts from './components/Admin/AdminProducts';
 import AdminCategories from './components/Admin/AdminCategories';
 import AdminCoupons from './components/Admin/AdminCoupons';
+import AdminSettings from './components/Admin/AdminSettings';
 import AdminCalendar from './components/Admin/AdminCalendar';
 import AdminAiAssistant from './components/Admin/AdminAiAssistant';
 
@@ -34,6 +37,21 @@ export default function App() {
   // Navigation & Store State
   const [activeAdmin, setActiveAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState('dashboard');
+
+  // User Auth State
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('blossom_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('user');
+
+  // Dynamic Settings State
+  const [websiteSettings, setWebsiteSettings] = useState({
+    announcementText: "Jaipur Studio Open for Luxury Bridal Trousseau & Festival Bookings",
+    heroHeading: "Every Gift Tells a Story",
+    heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration."
+  });
   
   const [products, setProducts] = useState([
     {
@@ -175,19 +193,60 @@ export default function App() {
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Fetch products from backend API on mount
+  // Keyboard shortcut listener Ctrl + Alt + A for Admin login
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        setAuthModalMode('admin');
+        setAuthModalOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Fetch products & website settings from REST API on mount
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) {
-          setProducts(data.data);
-        }
+        if (data.success && data.data && data.data.length > 0) setProducts(data.data);
       })
       .catch(err => console.warn("API products fallback:", err));
+
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) setWebsiteSettings(data.data);
+      })
+      .catch(err => console.warn("API settings fallback:", err));
   }, []);
 
+  const handleAuthSuccess = (user, token, isAdmin = false) => {
+    setCurrentUser(user);
+    localStorage.setItem('blossom_user', JSON.stringify(user));
+    if (token) localStorage.setItem('blossom_token', token);
+
+    if (isAdmin) {
+      setActiveAdmin(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('blossom_user');
+    localStorage.removeItem('blossom_token');
+    setActiveAdmin(false);
+  };
+
   const handleAddToCart = (product, variantName = 'Standard', quantity = 1, customMsg = '') => {
+    if (!currentUser) {
+      setAuthModalMode('user');
+      setAuthModalOpen(true);
+      return;
+    }
+
     const existingIndex = cartItems.findIndex(i => i.id === product._id && i.variant === variantName);
     const itemPrice = product.discountPrice || product.price;
 
@@ -243,9 +302,11 @@ export default function App() {
           {adminTab === 'dashboard' && <AdminDashboard onNavigate={setAdminTab} />}
           {adminTab === 'custom-orders' && <AdminCustomOrders />}
           {adminTab === 'orders' && <AdminOrders />}
+          {adminTab === 'users' && <AdminUsers />}
           {adminTab === 'products' && <AdminProducts />}
           {adminTab === 'categories' && <AdminCategories />}
           {adminTab === 'coupons' && <AdminCoupons />}
+          {adminTab === 'settings' && <AdminSettings onSettingsUpdated={setWebsiteSettings} />}
           {adminTab === 'calendar' && <AdminCalendar />}
           {adminTab === 'ai-copywriter' && <AdminAiAssistant />}
         </AdminLayout>
@@ -255,17 +316,34 @@ export default function App() {
           <Navbar 
             cartCount={cartItems.reduce((sum, i) => sum + i.quantity, 0)}
             onOpenCart={() => setIsCartOpen(true)}
-            onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
+            onOpenCustomOrder={() => {
+              if (!currentUser) {
+                setAuthModalMode('user');
+                setAuthModalOpen(true);
+              } else {
+                setIsCustomOrderOpen(true);
+              }
+            }}
             onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
             onOpenQuiz={() => setIsQuizOpen(true)}
             onOpenPlanner={() => setIsPlannerOpen(true)}
             onOpenOrderTracker={() => setIsOrderTrackerOpen(true)}
-            activeAdmin={activeAdmin}
-            onToggleAdmin={() => setActiveAdmin(true)}
+            currentUser={currentUser}
+            onOpenAuthModal={(m) => { setAuthModalMode(m); setAuthModalOpen(true); }}
+            onLogout={handleLogout}
+            onTriggerAdminAuth={() => { setAuthModalMode('admin'); setAuthModalOpen(true); }}
           />
 
           <Hero 
-            onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
+            settings={websiteSettings}
+            onOpenCustomOrder={() => {
+              if (!currentUser) {
+                setAuthModalMode('user');
+                setAuthModalOpen(true);
+              } else {
+                setIsCustomOrderOpen(true);
+              }
+            }}
             onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
             onOpenQuiz={() => setIsQuizOpen(true)}
           />
@@ -278,7 +356,14 @@ export default function App() {
               const el = document.getElementById('collection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
+            onOpenCustomOrder={() => {
+              if (!currentUser) {
+                setAuthModalMode('user');
+                setAuthModalOpen(true);
+              } else {
+                setIsCustomOrderOpen(true);
+              }
+            }}
           />
 
           <ProductGallery 
@@ -307,6 +392,13 @@ export default function App() {
       )}
 
       {/* --- STOREFRONT MODALS --- */}
+      <AuthModal 
+        isOpen={authModalOpen}
+        initialMode={authModalMode}
+        onClose={() => setAuthModalOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
+
       {activeQuickViewProduct && (
         <ProductModal 
           product={activeQuickViewProduct}

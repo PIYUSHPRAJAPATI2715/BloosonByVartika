@@ -1,14 +1,16 @@
 import React from 'react';
-import { LayoutDashboard, Gift, ShoppingBag, Box, Tag, Calendar, Sparkles, Store, ShieldCheck, FileText, Layers } from 'lucide-react';
+import { LayoutDashboard, Gift, ShoppingBag, Box, Tag, Calendar, Sparkles, Store, ShieldCheck, FileText, Layers, Users, Sliders } from 'lucide-react';
 
 export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, children }) {
   const menuItems = [
     { id: 'dashboard', label: 'Executive Dashboard', icon: <LayoutDashboard size={18} /> },
     { id: 'custom-orders', label: 'Custom Requests', icon: <Gift size={18} />, badge: 'New' },
     { id: 'orders', label: 'Order Management', icon: <ShoppingBag size={18} /> },
+    { id: 'users', label: 'Registered Clients', icon: <Users size={18} /> },
     { id: 'products', label: 'Product Catalog & Stock', icon: <Box size={18} /> },
     { id: 'categories', label: 'Category Manager', icon: <Layers size={18} /> },
     { id: 'coupons', label: 'Coupons & Promos', icon: <Tag size={18} /> },
+    { id: 'settings', label: 'Website Customizer', icon: <Sliders size={18} /> },
     { id: 'calendar', label: 'Wedding Calendar', icon: <Calendar size={18} /> },
     { id: 'ai-copywriter', label: 'AI Copy & Marketing', icon: <Sparkles size={18} />, badge: 'AI' }
   ];

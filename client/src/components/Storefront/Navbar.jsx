@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Search, Sparkles, Truck, SlidersHorizontal, ShieldCheck, Heart } from 'lucide-react';
+import { ShoppingBag, Search, Sparkles, Truck, User, LogOut, Lock } from 'lucide-react';
 
 export default function Navbar({ 
   cartCount, 
@@ -9,11 +9,12 @@ export default function Navbar({
   onOpenQuiz, 
   onOpenPlanner,
   onOpenOrderTracker,
-  activeAdmin,
-  onToggleAdmin
+  currentUser,
+  onOpenAuthModal,
+  onLogout,
+  onTriggerAdminAuth
 }) {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,9 +95,9 @@ export default function Navbar({
 
         {/* Desktop Nav Items */}
         <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-          <a href="#services" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem', transition: 'color 0.2s' }}>Services</a>
-          <a href="#collection" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem', transition: 'color 0.2s' }}>Collection</a>
-          <a href="#about" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem', transition: 'color 0.2s' }}>Story</a>
+          <a href="#services" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem' }}>Services</a>
+          <a href="#collection" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem' }}>Collection</a>
+          <a href="#about" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 500, fontSize: '0.92rem' }}>Story</a>
           
           <button 
             onClick={onOpenPlanner} 
@@ -121,7 +122,7 @@ export default function Navbar({
         </nav>
 
         {/* Right Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           
           {/* Order Tracker Icon */}
           <button 
@@ -156,26 +157,48 @@ export default function Navbar({
             </span>
           </button>
 
-          {/* Admin Switcher Button */}
+          {/* User Sign In / Profile Button */}
+          {currentUser ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ background: '#FFF9F6', border: '1px solid #C8A45D', padding: '6px 14px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 600, color: '#2E2E2E', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <User size={14} color="#C8A45D" />
+                <span>{currentUser.name.split(' ')[0]}</span>
+              </div>
+              <button onClick={onLogout} title="Sign Out" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888' }}>
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => onOpenAuthModal('user')}
+              style={{
+                background: '#2E2E2E',
+                color: '#F4E8C1',
+                border: 'none',
+                borderRadius: '30px',
+                padding: '8px 18px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <User size={15} />
+              <span>Sign In / Sign Up</span>
+            </button>
+          )}
+
+          {/* Subtle Protected Admin Lock Link */}
           <button 
-            onClick={onToggleAdmin}
-            style={{
-              background: activeAdmin ? '#C8A45D' : '#2E2E2E',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '30px',
-              padding: '8px 16px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
+            onClick={onTriggerAdminAuth}
+            title="Studio Admin Portal"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(0,0,0,0.2)', padding: '4px' }}
           >
-            <ShieldCheck size={15} />
-            {activeAdmin ? 'Store View' : 'Admin Panel'}
+            <Lock size={14} />
           </button>
+
         </div>
       </div>
     </header>

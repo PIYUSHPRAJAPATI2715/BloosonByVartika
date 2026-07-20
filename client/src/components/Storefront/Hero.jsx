@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Gift, Heart, ChevronRight, ArrowUpRight } from 'lucide-react';
 
-export default function Hero({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz }) {
+export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz }) {
   const [boxOpened, setBoxOpened] = useState(false);
 
   return (
