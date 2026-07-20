@@ -108,6 +108,9 @@ router.get('/settings', async (req, res) => {
         heroHeading: "Every Gift Tells a Story",
         heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration.",
         tagline: "Luxury Trousseau Packaging | Premium Gift Hampers",
+        giftBoxImage: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
+        giftBoxTitle: "Tap to Unwrap Luxury",
+        giftBoxSubtitle: "Handcrafted Bridal Trousseau Box Set",
         boutiquePhone: "+91 98290 00000",
         boutiqueAddress: "Plot 45, Malviya Nagar Luxury Corridor, Jaipur, Rajasthan 302017"
       }

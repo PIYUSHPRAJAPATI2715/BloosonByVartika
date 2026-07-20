@@ -215,28 +215,32 @@ export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder,
               </div>
 
               {/* Box Inside Content revealed on open */}
-              <div style={{ zIndex: 3, opacity: boxOpened ? 1 : 0.8, transition: 'opacity 0.4s' }}>
+              <div style={{ zIndex: 3, opacity: boxOpened ? 1 : 0.9, transition: 'all 0.4s ease' }}>
                 {boxOpened ? (
                   <div style={{ animation: 'pulseGlow 2s infinite' }}>
-                    <div style={{ fontSize: '3.5rem', marginBottom: '8px' }}>✨👑💍</div>
-                    <h4 style={{ fontFamily: 'var(--font-serif)', color: '#9A7734', fontSize: '1.2rem', marginBottom: '4px' }}>
-                      Royal Maharani Set Revealed
+                    <img 
+                      src={settings?.giftBoxImage || "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800"} 
+                      alt="Unwrapped Gift" 
+                      style={{ width: '140px', height: '110px', objectFit: 'cover', borderRadius: '14px', border: '2px solid #C8A45D', margin: '0 auto 10px', boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }} 
+                    />
+                    <h4 style={{ fontFamily: 'var(--font-serif)', color: '#9A7734', fontSize: '1.15rem', margin: '0 0 4px' }}>
+                      {settings?.giftBoxTitle || "Royal Maharani Set Revealed"}
                     </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#4A4A4A' }}>
-                      Hand-carved velvet box, fresh roses & zari shagun tray
+                    <p style={{ fontSize: '0.8rem', color: '#4A4A4A', margin: 0 }}>
+                      {settings?.giftBoxSubtitle || "Handcrafted Bridal Trousseau Box Set"}
                     </p>
-                    <span style={{ display: 'inline-block', marginTop: '12px', background: '#C8A45D', color: '#FFF', fontSize: '0.75rem', padding: '4px 10px', borderRadius: '12px' }}>
-                      Click to Close
+                    <span style={{ display: 'inline-block', marginTop: '10px', background: '#C8A45D', color: '#FFF', fontSize: '0.75rem', padding: '4px 12px', borderRadius: '12px', fontWeight: 600 }}>
+                      Tap to Close Box
                     </span>
                   </div>
                 ) : (
-                  <div style={{ marginTop: '40px' }}>
-                    <Gift size={48} color="#C8A45D" />
-                    <p style={{ fontFamily: 'var(--font-subserif)', fontSize: '1.15rem', color: '#2E2E2E', marginTop: '12px', fontWeight: 600 }}>
-                      Tap to Unwrap Luxury
+                  <div style={{ marginTop: '30px' }}>
+                    <Gift size={44} color="#C8A45D" />
+                    <p style={{ fontFamily: 'var(--font-subserif)', fontSize: '1.1rem', color: '#2E2E2E', marginTop: '10px', fontWeight: 600 }}>
+                      {settings?.giftBoxTitle || "Tap to Unwrap Luxury"}
                     </p>
-                    <span style={{ fontSize: '0.78rem', color: '#C98BA2' }}>
-                      Interactive Gift Box
+                    <span style={{ fontSize: '0.78rem', color: '#C98BA2', fontWeight: 600 }}>
+                      {settings?.giftBoxSubtitle || "Interactive Gift Box"}
                     </span>
                   </div>
                 )}

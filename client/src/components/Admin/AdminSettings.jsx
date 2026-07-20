@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sliders, Save, CheckCircle2, Globe, Phone, MapPin, Sparkles } from 'lucide-react';
+import { Sliders, Save, CheckCircle2, Globe, Phone, MapPin, Sparkles, Gift, Image } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function AdminSettings({ onSettingsUpdated }) {
@@ -8,6 +8,9 @@ export default function AdminSettings({ onSettingsUpdated }) {
     heroHeading: "Every Gift Tells a Story",
     heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration.",
     tagline: "Luxury Trousseau Packaging | Premium Gift Hampers",
+    giftBoxImage: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
+    giftBoxTitle: "Tap to Unwrap Luxury",
+    giftBoxSubtitle: "Handcrafted Bridal Trousseau Box Set",
     boutiqueAddress: "Plot 45, Malviya Nagar Luxury Corridor, Jaipur, Rajasthan 302017",
     boutiquePhone: "+91 98290 00000",
     boutiqueEmail: "contact@blossombyvartika.com"
@@ -47,21 +50,23 @@ export default function AdminSettings({ onSettingsUpdated }) {
     <div>
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#F4E8C1', margin: 0 }}>
-          Dynamic Homepage & Studio Settings
+          Dynamic Homepage & 3D Hero Customizer
         </h1>
         <p style={{ color: '#AAA', fontSize: '0.88rem' }}>
-          Update hero headings, announcement bar text, phone, and boutique address live without coding.
+          Edit 3D gift box teaser images, hero title, announcement text, and boutique contact details live.
         </p>
       </div>
 
-      <div style={{ background: '#282828', borderRadius: '20px', padding: '28px', border: '1px solid #C8A45D', maxWidth: '750px' }}>
+      <div style={{ background: '#282828', borderRadius: '20px', padding: '28px', border: '1px solid #C8A45D', maxWidth: '780px' }}>
         {savedSuccess && (
           <div style={{ background: '#1B3E2B', color: '#4CAF50', padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-            <CheckCircle2 size={18} /> Website settings updated live!
+            <CheckCircle2 size={18} /> Website & 3D Gift Box settings updated live!
           </div>
         )}
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          
+          {/* Top Announcement Bar */}
           <div>
             <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#C8A45D', display: 'block', marginBottom: '6px' }}>
               Top Announcement Bar Text
@@ -74,6 +79,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
             />
           </div>
 
+          {/* Hero Heading & Subheading */}
           <div>
             <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#C8A45D', display: 'block', marginBottom: '6px' }}>
               Hero Section Main Heading
@@ -98,6 +104,50 @@ export default function AdminSettings({ onSettingsUpdated }) {
             />
           </div>
 
+          {/* 3D Gift Box Animation Customizer */}
+          <div style={{ background: '#1E1E1E', borderRadius: '16px', padding: '20px', border: '1px solid rgba(200,164,93,0.3)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#F4E8C1', fontWeight: 700, fontFamily: 'var(--font-serif)', fontSize: '1.1rem' }}>
+              <Gift size={18} color="#C8A45D" /> 3D Interactive Gift Box Animation Settings
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>3D Unwrapping Gift Box Image URL</label>
+                <input 
+                  type="text" 
+                  value={settings.giftBoxImage || ''} 
+                  onChange={e => setSettings({...settings, giftBoxImage: e.target.value})} 
+                  placeholder="https://images.unsplash.com/..." 
+                  style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Gift Box Teaser Title</label>
+                  <input 
+                    type="text" 
+                    value={settings.giftBoxTitle || ''} 
+                    onChange={e => setSettings({...settings, giftBoxTitle: e.target.value})} 
+                    placeholder="Tap to Unwrap Luxury" 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Gift Box Subtitle</label>
+                  <input 
+                    type="text" 
+                    value={settings.giftBoxSubtitle || ''} 
+                    onChange={e => setSettings({...settings, giftBoxSubtitle: e.target.value})} 
+                    placeholder="Handcrafted Trousseau Box Set" 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Details */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <div>
               <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#C8A45D', display: 'block', marginBottom: '6px' }}>
