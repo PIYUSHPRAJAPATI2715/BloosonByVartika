@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, onRemoveItem, onClearCart }) {
   const [couponCode, setCouponCode] = useState('');
@@ -24,7 +25,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
     try {
-      const res = await fetch('/api/coupons/validate', {
+      const res = await fetch(getApiUrl('/api/coupons/validate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode, cartTotal: subtotal })
@@ -64,7 +65,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     };
 
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch(getApiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)

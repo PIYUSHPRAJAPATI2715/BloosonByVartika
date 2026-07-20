@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, ShoppingBag, Clock, Users, Gift, Eye, ArrowUpRight, TrendingUp, AlertTriangle } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminDashboard({ onNavigate }) {
   const [stats, setStats] = useState({
@@ -16,7 +17,7 @@ export default function AdminDashboard({ onNavigate }) {
   });
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    fetch(getApiUrl('/api/admin/stats'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.stats) setStats(data.stats);

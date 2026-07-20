@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, MessageCircle, Send, CheckCircle2, XCircle, Clock, DollarSign } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminCustomOrders() {
   const [customRequests, setCustomRequests] = useState([
@@ -40,7 +41,7 @@ export default function AdminCustomOrders() {
   const [noteInput, setNoteInput] = useState('');
 
   useEffect(() => {
-    fetch('/api/custom-orders')
+    fetch(getApiUrl('/api/custom-orders'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setCustomRequests(data.data);
@@ -55,7 +56,7 @@ export default function AdminCustomOrders() {
     setCustomRequests(updatedList);
 
     try {
-      await fetch(`/api/custom-orders/${id}`, {
+      await fetch(getApiUrl(`/api/custom-orders/${id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus, quotedPrice: price, adminNotes: notes })

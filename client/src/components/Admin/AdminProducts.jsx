@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Box, Image, Tag, Sparkles } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([
@@ -36,11 +37,11 @@ export default function AdminProducts() {
     discountPrice: '',
     stock: 10,
     images: ['https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600'],
-    description: ''
+    description: 'Handcrafted luxury hamper with gold ribbon detailing.'
   });
 
   useEffect(() => {
-    fetch('/api/products')
+    fetch(getApiUrl('/api/products'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setProducts(data.data);
@@ -50,25 +51,50 @@ export default function AdminProducts() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    const created = { ...newProduct, _id: Date.now().toString(), price: Number(newProduct.price), discountPrice: Number(newProduct.discountPrice) };
-    setProducts([created, ...products]);
-    setShowAddModal(false);
+    const autoSku = newProduct.sku.trim() || `BV-PROD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const payload = { 
+      name: newProduct.name || "Custom Luxury Hamper",
+      sku: autoSku,
+      category: newProduct.category || "Wedding Collection",
+      price: Number(newProduct.price) || 4500,
+      discountPrice: Number(newProduct.discountPrice) || (Number(newProduct.price) ? Number(newProduct.price) * 0.9 : 3990),
+      stock: Number(newProduct.stock) || 10,
+      images: newProduct.images && newProduct.images.length > 0 ? newProduct.images : ["https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600"],
+      description: newProduct.description || "Handcrafted luxury hamper with bespoke embellishments."
+    };
 
     try {
-      await fetch('/api/products', {
+      const res = await fetch(getApiUrl('/api/products'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(created)
+        body: JSON.stringify(payload)
       });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setProducts([data.data, ...products]);
+      } else {
+        setProducts([{ ...payload, _id: Date.now().toString() }, ...products]);
+      }
     } catch (err) {
-      console.warn("Product create fallback:", err);
+      setProducts([{ ...payload, _id: Date.now().toString() }, ...products]);
     }
+    setShowAddModal(false);
+    setNewProduct({
+      name: '',
+      sku: '',
+      category: 'Wedding Collection',
+      price: '',
+      discountPrice: '',
+      stock: 10,
+      images: ['https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600'],
+      description: 'Handcrafted luxury hamper with gold ribbon detailing.'
+    });
   };
 
   const handleDelete = async (id) => {
     setProducts(products.filter(p => p._id !== id));
     try {
-      await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      await fetch(getApiUrl(`/api/products/${id}`), { method: 'DELETE' });
     } catch (err) {
       console.warn("Delete fallback:", err);
     }
@@ -116,7 +142,7 @@ export default function AdminProducts() {
                 <td style={{ padding: '14px 18px', color: '#AAA' }}>{p.sku}</td>
                 <td style={{ padding: '14px 18px', color: '#E8B7C9' }}>{p.category}</td>
                 <td style={{ padding: '14px 18px', fontWeight: 700, color: '#FFF' }}>
-                  ₹{p.price.toLocaleString('en-IN')}
+                  ₹{(p.discountPrice || p.price || 0).toLocaleString('en-IN')}
                 </td>
                 <td style={{ padding: '14px 18px' }}>
                   <span style={{ background: p.stock < 5 ? '#5A2A2A' : '#1E1E1E', color: p.stock < 5 ? '#FF6B6B' : '#4CAF50', padding: '4px 10px', borderRadius: '10px', fontWeight: 600 }}>
@@ -144,13 +170,13 @@ export default function AdminProducts() {
 
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Product Name</label>
+                <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Product Name *</label>
                 <input type="text" required value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#AAA' }}>SKU Code</label>
-                  <input type="text" required value={newProduct.sku} onChange={e => setNewProduct({...newProduct, sku: e.target.value})} placeholder="BV-HAMPER-09" style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
+                  <label style={{ fontSize: '0.8rem', color: '#AAA' }}>SKU Code (Auto if empty)</label>
+                  <input type="text" value={newProduct.sku} onChange={e => setNewProduct({...newProduct, sku: e.target.value})} placeholder="BV-HAMPER-09" style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
                 </div>
                 <div>
                   <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Category</label>
@@ -167,7 +193,7 @@ export default function AdminProducts() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Price (₹)</label>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Price (₹) *</label>
                   <input type="number" required value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
                 </div>
                 <div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Mail, Phone, ShoppingBag, DollarSign, MessageCircle, Download } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([
@@ -9,7 +10,7 @@ export default function AdminUsers() {
   ]);
 
   useEffect(() => {
-    fetch('/api/users')
+    fetch(getApiUrl('/api/users'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setUsers(data.data);

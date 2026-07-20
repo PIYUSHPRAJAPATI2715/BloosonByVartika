@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Gift, Upload, CheckCircle2, Send, Sparkles } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function CustomOrderModal({ onClose }) {
   const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ export default function CustomOrderModal({ onClose }) {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/custom-orders', {
+      const res = await fetch(getApiUrl('/api/custom-orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

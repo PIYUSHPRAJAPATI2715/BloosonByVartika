@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sliders, Save, CheckCircle2, Globe, Phone, MapPin, Sparkles } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminSettings({ onSettingsUpdated }) {
   const [settings, setSettings] = useState({
@@ -14,7 +15,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
-    fetch('/api/settings')
+    fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) setSettings(data.data);
@@ -25,7 +26,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/settings', {
+      const res = await fetch(getApiUrl('/api/settings'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)

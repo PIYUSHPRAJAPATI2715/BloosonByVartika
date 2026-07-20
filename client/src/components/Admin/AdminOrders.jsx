@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Printer, Eye, Truck, CheckCircle2, Search } from 'lucide-react';
+import { ShoppingBag, Eye, Truck, CheckCircle2, Clock, MapPin, Printer } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([
@@ -27,7 +28,7 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch(getApiUrl('/api/orders'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setOrders(data.data);
@@ -40,7 +41,7 @@ export default function AdminOrders() {
     setOrders(updated);
 
     try {
-      await fetch(`/api/orders/${id}/status`, {
+      await fetch(getApiUrl(`/api/orders/${id}/status`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderStatus: status })
