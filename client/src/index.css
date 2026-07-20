@@ -1,0 +1,199 @@
+/* Custom Design System for Blossom by Vartika */
+:root {
+  --blush-pink: #E8B7C9;
+  --blush-pink-light: #F8E3EC;
+  --blush-pink-dark: #C98BA2;
+  --gold-accent: #C8A45D;
+  --gold-light: #F4E8C1;
+  --gold-dark: #9A7734;
+  --cream-bg: #FFF9F6;
+  --white-bg: #FFFFFF;
+  --charcoal-dark: #2E2E2E;
+  --charcoal-light: #4A4A4A;
+  --velvet-overlay: rgba(46, 46, 46, 0.75);
+  
+  --font-serif: 'Playfair Display', serif;
+  --font-subserif: 'Cormorant Garamond', serif;
+  --font-sans: 'Poppins', sans-serif;
+  
+  --shadow-luxury: 0 20px 40px -15px rgba(200, 164, 93, 0.25);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 25px rgba(232, 183, 201, 0.6);
+  --radius-luxury: 16px;
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--cream-bg);
+  color: var(--charcoal-dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--blush-pink-dark);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-accent);
+}
+
+/* Typography Helpers */
+.font-serif {
+  font-family: var(--font-serif);
+}
+.font-subserif {
+  font-family: var(--font-subserif);
+}
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.title-gold-gradient {
+  background: linear-gradient(135deg, #2E2E2E 0%, #C8A45D 50%, #9A7734 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title-blush-gradient {
+  background: linear-gradient(135deg, #C98BA2 0%, #E8B7C9 50%, #C8A45D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 164, 93, 0.25);
+  box-shadow: 0 15px 35px rgba(232, 183, 201, 0.15);
+}
+
+.glass-panel-dark {
+  background: rgba(46, 46, 46, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(200, 164, 93, 0.35);
+  color: #FFFFFF;
+}
+
+/* Buttons */
+.btn-gold {
+  background: linear-gradient(135deg, #C8A45D 0%, #B89248 100%);
+  color: #FFFFFF;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(200, 164, 93, 0.35);
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.btn-gold:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(200, 164, 93, 0.5);
+  background: linear-gradient(135deg, #D4AF37 0%, #C8A45D 100%);
+}
+
+.btn-blush {
+  background: linear-gradient(135deg, #E8B7C9 0%, #D8A2B6 100%);
+  color: #2E2E2E;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(232, 183, 201, 0.4);
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.btn-blush:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(232, 183, 201, 0.65);
+}
+
+.btn-outline-gold {
+  background: transparent;
+  color: var(--charcoal-dark);
+  padding: 13px 26px;
+  border-radius: 30px;
+  font-weight: 500;
+  border: 1.5px solid var(--gold-accent);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.btn-outline-gold:hover {
+  background: var(--gold-accent);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(3deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(200, 164, 93, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(232, 183, 201, 0.7); }
+}
+
+@keyframes ribbonUntie {
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animate-float {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: pulseGlow 4s infinite;
+}
+
+/* Ribbon Accent */
+.ribbon-tag {
+  position: relative;
+  display: inline-block;
+  padding: 4px 14px;
+  background: var(--blush-pink-light);
+  color: var(--charcoal-dark);
+  border-left: 3px solid var(--gold-accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 0 4px 4px 0;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "blossom-by-vartika-backend",
+  "version": "1.0.0",
+  "description": "Backend API server for Blossom by Vartika - Luxury Trousseau Packaging & Gift Hampers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": ["luxury", "gifting", "wedding", "trousseau", "mongodb", "node"],
+  "author": "Vartika Gupta / Blossom Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
