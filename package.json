@@ -1,0 +1,16 @@
+{
+  "name": "blossom-by-vartika-monorepo",
+  "version": "1.0.0",
+  "description": "Blossom by Vartika Luxury Storefront, Admin Panel & Node.js API",
+  "main": "server/server.js",
+  "scripts": {
+    "build": "cd server && npm install",
+    "start": "cd server && npm start",
+    "server": "cd server && npm start",
+    "client": "cd client && npm run dev",
+    "seed": "cd server && npm run seed"
+  },
+  "keywords": ["luxury", "gifting", "jaipur", "mongodb", "render"],
+  "author": "Vartika Gupta",
+  "license": "MIT"
+}
