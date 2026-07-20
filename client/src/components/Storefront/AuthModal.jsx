@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, Phone, User as UserIcon, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode = 'user' }) {
   if (!isOpen) return null;
@@ -22,7 +23,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
 
     try {
       if (mode === 'admin') {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(getApiUrl('/api/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email, password: formData.password, isAdminGateway: true })
@@ -35,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
           setErrorMsg(data.message || 'Invalid admin credentials');
         }
       } else if (isRegister) {
-        const res = await fetch('/api/auth/register', {
+        const res = await fetch(getApiUrl('/api/auth/register'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -48,7 +49,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
           setErrorMsg(data.message || 'Registration failed');
         }
       } else {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(getApiUrl('/api/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email, password: formData.password })

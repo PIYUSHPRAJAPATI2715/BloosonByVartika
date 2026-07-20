@@ -19,6 +19,7 @@ import ContactSection from './components/Storefront/ContactSection';
 import Footer from './components/Storefront/Footer';
 import PetalCanvas from './components/PetalCanvas';
 import SoundToggle from './components/SoundToggle';
+import { getApiUrl } from './config/api';
 
 // Admin imports
 import AdminLayout from './components/Admin/AdminLayout';
@@ -208,14 +209,14 @@ export default function App() {
 
   // Fetch products & website settings from REST API on mount
   useEffect(() => {
-    fetch('/api/products')
+    fetch(getApiUrl('/api/products'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setProducts(data.data);
       })
       .catch(err => console.warn("API products fallback:", err));
 
-    fetch('/api/settings')
+    fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data) setWebsiteSettings(data.data);
