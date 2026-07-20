@@ -10,10 +10,8 @@ export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQ
           
           {/* Brand Info */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #E8B7C9 0%, #C8A45D 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '1.2rem' }}>🌸</span>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <img src="/logo.png" alt="Blossom By Vartika Logo" style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'contain', border: '1.5px solid #C8A45D', background: '#FFF', padding: '2px' }} />
               <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 700, color: '#F4E8C1' }}>
                 Blossom by Vartika
               </span>

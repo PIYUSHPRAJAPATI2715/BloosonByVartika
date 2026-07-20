@@ -81,24 +81,22 @@ export default function Navbar({
         }}
       >
         
-        {/* Left: Brand Crest & Logo */}
+        {/* Left: Official Blossom By Vartika Logo */}
         <a href="#" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div 
+          <img 
+            src="/logo.png" 
+            alt="Blossom By Vartika Logo" 
             style={{
-              width: '44px',
-              height: '44px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 50%, #C8A45D 100%)',
-              border: '1.5px solid #C8A45D',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 6px 18px rgba(200, 164, 93, 0.3)',
-              fontSize: '1.35rem'
+              objectFit: 'contain',
+              border: '2px solid #C8A45D',
+              boxShadow: '0 4px 15px rgba(200, 164, 93, 0.35)',
+              background: '#FFFFFF',
+              padding: '2px'
             }}
-          >
-            🌸
-          </div>
+          />
           <div>
             <span 
               style={{ 

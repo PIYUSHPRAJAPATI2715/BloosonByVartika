@@ -33,10 +33,8 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
         <div>
           {/* Admin Header */}
           <div style={{ padding: '0 8px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#C8A45D', color: '#1E1E1E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                👑
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img src="/logo.png" alt="Blossom By Vartika Logo" style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'contain', border: '1.5px solid #C8A45D', background: '#FFF', padding: '2px' }} />
               <div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: '#F4E8C1', margin: 0 }}>
                   Blossom Studio
