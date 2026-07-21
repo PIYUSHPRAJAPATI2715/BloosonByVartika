@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+// Clear any cached model schema to force fresh compilation without legacy enum restrictions
+if (mongoose.models && mongoose.models.Order) {
+  delete mongoose.models.Order;
+}
+if (mongoose.modelSchemas && mongoose.modelSchemas.Order) {
+  delete mongoose.modelSchemas.Order;
+}
+
 const orderItemSchema = new mongoose.Schema({
   productName: String,
   variantName: String,
@@ -22,7 +30,7 @@ const orderSchema = new mongoose.Schema({
   totalAmount: { type: Number, default: 0 },
   couponApplied: { type: String },
   transactionRef: { type: String },
-  paymentMethod: { type: String, default: 'Studio Owner Call & Confirm (+91 98280 23641)' },
+  paymentMethod: { type: String, default: 'UPI' },
   paymentStatus: { type: String, default: 'Owner Call Scheduled' },
   orderStatus: { 
     type: String, 
@@ -33,4 +41,4 @@ const orderSchema = new mongoose.Schema({
   customerNotes: { type: String }
 }, { timestamps: true });
 
-module.exports = mongoose.models.Order || mongoose.model('Order', orderSchema);
+module.exports = mongoose.model('Order', orderSchema);

@@ -16,7 +16,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     customerPhone: '',
     shippingAddress: '',
     city: 'Jaipur',
-    paymentMethod: 'Studio Owner Call & Confirm (+91 98280 23641)'
+    paymentMethod: 'UPI'
   });
   const [completedOrder, setCompletedOrder] = useState(null);
 

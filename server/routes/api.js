@@ -289,7 +289,7 @@ router.post('/orders', async (req, res) => {
     const newOrder = await Order.create({ 
       ...req.body, 
       orderNumber, 
-      paymentMethod: 'Studio Owner Call & Confirm (+91 98280 23641)',
+      paymentMethod: 'UPI',
       paymentStatus: 'Owner Call Scheduled' 
     });
 
