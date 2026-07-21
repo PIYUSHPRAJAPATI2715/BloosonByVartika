@@ -227,71 +227,83 @@ router.get('/orders', async (req, res) => {
   }
 });
 
-// Helper function for Silent Backend WhatsApp API Notifications (No Popup Window)
-const sendSilentWhatsappNotification = async (orderData) => {
+// Automated WhatsApp Notification API Dispatcher from Owner's WhatsApp Number (+91 98280 23641)
+const sendAutomatedCustomerWhatsappMessage = async (orderData) => {
   try {
-    const itemsText = orderData.items ? orderData.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('\n') : 'Bridal Hamper Set';
-    const ownerMsg = `🌸 *NEW UPI ORDER RECEIVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\n\nItems:\n${itemsText}\n\nTotal Paid: ₹${orderData.totalAmount}\nPayment: Paytm / UPI QR Code\nUTR Txn ID: ${orderData.transactionRef}\nPayment Status: Verification Pending against Bank Statement`;
+    const cleanCustomerPhone = (orderData.customerPhone || '').replace(/[^0-9]/g, '');
+    const formattedCustomerPhone = cleanCustomerPhone.length === 10 ? `91${cleanCustomerPhone}` : cleanCustomerPhone;
+
+    const itemsText = orderData.items ? orderData.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('\n') : 'Luxury Hamper Set';
+    
+    // Automated Message to Customer from Owner's Number (+91 98280 23641)
+    const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
+
+    // Automated Message to Owner Vartika Gupta (+91 98280 23641)
+    const ownerMsg = `🌸 *NEW ORDER RESERVED* 🌸\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal: ₹${orderData.totalAmount}\nItems:\n${itemsText}`;
 
     console.log("--------------------------------------------------");
-    console.log("📲 [AUTOMATED SILENT WHATSAPP API SENT TO OWNER +91 98280 23641]");
-    console.log(ownerMsg);
+    console.log(`📲 [AUTOMATED WHATSAPP SENT FROM +91 98280 23641 TO CUSTOMER ${formattedCustomerPhone}]`);
+    console.log(customerMsg);
     console.log("--------------------------------------------------");
 
-    // If external WhatsApp API (Twilio / UltraMsg / WATI) webhook URL is configured:
-    if (process.env.WHATSAPP_API_URL) {
-      await fetch(process.env.WHATSAPP_API_URL, {
+    // UltraMsg / Whapi / Twilio automated WhatsApp sender API webhook integration
+    const whatsappApiUrl = process.env.WHATSAPP_API_URL || (process.env.ULTRAMSG_INSTANCE_ID ? `https://api.ultramsg.com/${process.env.ULTRAMSG_INSTANCE_ID}/messages/chat` : null);
+    
+    if (whatsappApiUrl) {
+      // Send to Customer
+      await fetch(whatsappApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          token: process.env.WHATSAPP_TOKEN || process.env.ULTRAMSG_TOKEN,
+          to: formattedCustomerPhone,
+          body: customerMsg,
+          message: customerMsg
+        })
+      });
+
+      // Send to Owner (+91 98280 23641)
+      await fetch(whatsappApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: process.env.WHATSAPP_TOKEN || process.env.ULTRAMSG_TOKEN,
           to: '919828023641',
-          customerPhone: orderData.customerPhone,
+          body: ownerMsg,
           message: ownerMsg
         })
       });
     }
   } catch (err) {
-    console.warn("Silent WhatsApp API error:", err);
+    console.warn("Automated WhatsApp API Error:", err);
   }
 };
 
 router.post('/orders', async (req, res) => {
   try {
-    const { transactionRef, customerName, customerPhone, totalAmount } = req.body;
+    const { customerName, customerPhone, shippingAddress } = req.body;
     
-    // 1. STRICT UTR REFERENCE FORMAT & ANTI-FAKE VALIDATION
-    const cleanUtr = (transactionRef || '').trim().replace(/\s+/g, '');
-    const isValidFormat = /^[0-9]{12}$/.test(cleanUtr) || /^[A-Za-z0-9]{12,16}$/.test(cleanUtr);
-    const uniqueDigits = new Set(cleanUtr.split('')).size;
-    const isFakePattern = uniqueDigits < 4 || ['000000000000','111111111111','222222222222','333333333333','444444444444','555555555555','666666666666','777777777777','888888888888','999999999999','123456789012','987654321098'].includes(cleanUtr);
-    
-    if (!cleanUtr || !isValidFormat || isFakePattern) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "❌ Payment Validation Error: Repeating or fake UTR numbers (e.g. 555555555567) are automatically rejected. Please scan Vartika Gupta's Paytm QR Code and enter your real 12-digit UTR from your bank receipt." 
-      });
+    if (!customerName || !customerPhone || !shippingAddress) {
+      return res.status(400).json({ success: false, message: 'Customer name, phone, and shipping address are required.' });
     }
 
-    // 2. ANTI-FRAUD DUPLICATE UTR VERIFICATION
-    const duplicateUtr = await Order.findOne({ transactionRef: cleanUtr });
-    if (duplicateUtr) {
-      return res.status(400).json({
-        success: false,
-        message: `❌ Payment Fraud Prevention: UTR ID ${cleanUtr} has already been submitted for Order #${duplicateUtr.orderNumber}. Reusing UTR numbers is prohibited.`
-      });
-    }
-
-    // 3. CREATE ORDER WITH VERIFICATION STATUS
     const orderNumber = 'BVL-' + Math.floor(100000 + Math.random() * 900000);
     const newOrder = await Order.create({ 
       ...req.body, 
-      transactionRef: cleanUtr,
       orderNumber, 
-      paymentStatus: 'Verification Pending (UTR Submitted)' 
+      paymentMethod: 'Studio Owner Call & Confirm (+91 98280 23641)',
+      paymentStatus: 'Owner Call Scheduled' 
     });
 
-    // 4. TRIGGER SILENT BACKGROUND WHATSAPP API NOTIFICATION
-    sendSilentWhatsappNotification(newOrder);
+    // Trigger automated silent WhatsApp notification from owner's number (+91 98280 23641) to customer
+    sendAutomatedCustomerWhatsappMessage(newOrder);
+
+    res.status(201).json({ success: true, data: newOrder });
+  } catch (err) {
+    console.error("Order creation error:", err);
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
 
     res.status(201).json({ success: true, data: newOrder });
   } catch (err) {

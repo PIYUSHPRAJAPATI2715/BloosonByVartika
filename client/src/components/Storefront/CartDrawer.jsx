@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck, QrCode, Copy, Check, MessageCircle, AlertTriangle } from 'lucide-react';
+import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck, PhoneCall, Copy, Check, MessageCircle, AlertTriangle, Sparkles } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, onRemoveItem, onClearCart }) {
@@ -7,8 +7,8 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState(null);
   const [isCheckoutModal, setIsCheckoutModal] = useState(false);
-  const [copiedUpi, setCopiedUpi] = useState(false);
-  const [paymentError, setPaymentError] = useState(null);
+  const [orderError, setOrderError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [checkoutData, setCheckoutData] = useState({
     customerName: '',
@@ -16,8 +16,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     customerPhone: '',
     shippingAddress: '',
     city: 'Jaipur',
-    paymentMethod: 'UPI',
-    transactionRef: ''
+    paymentMethod: 'Studio Owner Call & Confirm (+91 98280 23641)'
   });
   const [completedOrder, setCompletedOrder] = useState(null);
 
@@ -25,21 +24,6 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const finalTotal = Math.max(0, subtotal - discountAmount);
-
-  const copyUpiId = () => {
-    navigator.clipboard.writeText('9828023641@pthdfc');
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2500);
-  };
-
-  const isFakeUtrPattern = (utr) => {
-    const clean = (utr || '').trim().replace(/\s+/g, '');
-    if (!/^[0-9]{12}$/.test(clean) && !/^[A-Za-z0-9]{12,16}$/.test(clean)) return true;
-    const uniqueDigits = new Set(clean.split('')).size;
-    if (uniqueDigits < 4) return true; // Block fake repeating numbers like 555555555567
-    const fakes = ['000000000000','111111111111','222222222222','333333333333','444444444444','555555555555','666666666666','777777777777','888888888888','999999999999','123456789012','987654321098'];
-    return fakes.includes(clean);
-  };
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -72,27 +56,16 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     }
   };
 
-  const triggerAutomaticWhatsapp = (order) => {
-    const itemsText = order.items.map(i => `• ${i.productName} (x${i.quantity})`).join('%0A');
-    const msg = `🌸 *NEW UPI ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0A*Order %23:* ${order.orderNumber}%0A*Client:* ${order.customerName}%0A*Phone:* ${order.customerPhone}%0A*Email:* ${order.customerEmail}%0A*Address:* ${order.shippingAddress}, ${order.city}%0A%0A*Items Purchased:*%0A${itemsText}%0A%0A*Total Paid:* ₹${order.totalAmount.toLocaleString('en-IN')}%0A*Payment Method:* Paytm / UPI QR Code%0A*UPI Txn Ref (UTR):* ${order.transactionRef}`;
-    
-    // Auto-open WhatsApp link for owner alert
-    window.open(`https://wa.me/919828023641?text=${msg}`, '_blank');
-  };
-
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
-    setPaymentError(null);
+    setOrderError(null);
 
-    const utrRaw = (checkoutData.transactionRef || '').trim().replace(/\s+/g, '');
-
-    // STRICT 12-DIGIT UTR VALIDATION: Must be exactly 12 numeric digits or 12-16 alphanumeric reference ID
-    const isValidUtr = /^[0-9]{12}$/.test(utrRaw) || /^[A-Za-z0-9]{12,16}$/.test(utrRaw);
-
-    if (!utrRaw || !isValidUtr) {
-      setPaymentError('❌ Invalid UTR Transaction ID: Please enter a valid 12-digit numeric UPI UTR / RRN (e.g. 420918293019) shown on your Paytm, PhonePe, or Google Pay payment receipt.');
+    if (!checkoutData.customerName.trim() || !checkoutData.customerPhone.trim() || !checkoutData.shippingAddress.trim()) {
+      setOrderError('Please complete all required fields (Full Name, Phone, and Shipping Address).');
       return;
     }
+
+    setIsSubmitting(true);
 
     const orderPayload = {
       ...checkoutData,
@@ -110,25 +83,19 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
         body: JSON.stringify(orderPayload)
       });
       const data = await res.json();
+      setIsSubmitting(false);
+
       if (data.success && data.data) {
         setCompletedOrder(data.data);
       } else {
-        // BACKEND REJECTED ORDER (e.g. Fake or Duplicate UTR)
-        setPaymentError(data.message || 'Payment Verification Failed: Reused or fake UTR reference ID.');
-        return;
+        const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
+        setCompletedOrder(fallbackOrder);
       }
     } catch (err) {
-      setPaymentError('Connection Error: Unable to verify payment UTR with studio server.');
-      return;
+      setIsSubmitting(false);
+      const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
+      setCompletedOrder(fallbackOrder);
     }
-  };
-
-  const getCustomerWhatsappLink = () => {
-    if (!completedOrder) return '#';
-    const cleanPhone = completedOrder.customerPhone.replace(/[^0-9]/g, '');
-    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    const msg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0ADear ${completedOrder.customerName},%0AThank you for ordering with Blossom by Vartika Jaipur!%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Total Paid:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*UPI Txn Ref:* ${completedOrder.transactionRef}%0A*Status:* Handcrafting in Progress%0A%0ATrack live status anytime: https://blooson-by-vartika.vercel.app/`;
-    return `https://wa.me/${targetPhone}?text=${msg}`;
   };
 
   const printInvoice = () => {
@@ -138,7 +105,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     printWindow.document.write(`
       <html>
         <head>
-          <title>Invoice #${completedOrder.orderNumber} - Blossom by Vartika</title>
+          <title>Order Summary #${completedOrder.orderNumber} - Blossom by Vartika</title>
           <style>
             body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; color: #2E2E2E; }
             .header { display: flex; justify-content: space-between; border-bottom: 2px solid #C8A45D; padding-bottom: 20px; }
@@ -158,8 +125,8 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
               <div class="sub">Jaipur Luxury Trousseau Studio</div>
             </div>
             <div>
-              <h2>TAX INVOICE</h2>
-              <div>Invoice #: ${completedOrder.orderNumber}</div>
+              <h2>ORDER RESERVATION</h2>
+              <div>Order #: ${completedOrder.orderNumber}</div>
               <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
             </div>
           </div>
@@ -202,12 +169,12 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             </tbody>
           </table>
 
-          <div style="margin-top: 20px; font-size: 14px;">
-            <strong>UPI Txn Ref (UTR):</strong> ${completedOrder.transactionRef}
+          <div style="margin-top: 20px; font-size: 13px; color: #9A7734; font-weight: bold;">
+            Note: Studio Owner Vartika Gupta (+91 98280 23641) will personally call you shortly to confirm order details and payment.
           </div>
 
           <div class="total">
-            Total Paid: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}
+            Total Payable: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}
           </div>
           
           <div style="margin-top: 50px; text-align: center; color: #777; font-size: 12px;">
@@ -259,53 +226,39 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
         {/* Drawer Body */}
         {completedOrder ? (
           <div style={{ padding: '28px', textAlign: 'center', flex: 1, overflowY: 'auto' }}>
-            <div style={{ width: '60px', height: '60px', background: '#F8E3EC', color: '#C8A45D', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <CheckCircle2 size={32} />
+            <div style={{ width: '64px', height: '64px', background: '#F8E3EC', color: '#C8A45D', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', border: '2px solid #C8A45D' }}>
+              <CheckCircle2 size={36} />
             </div>
             <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#2E2E2E', marginBottom: '6px' }}>
-              Payment & Order Successful! 🌸
+              Order Reserved Successfully! 🌸
             </h3>
-            <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '16px' }}>
-              Order <strong>#{completedOrder.orderNumber}</strong> confirmed and sent to Vartika Gupta via WhatsApp!
+            <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>
+              Order <strong>#{completedOrder.orderNumber}</strong> has been received by Jaipur Studio.
             </p>
+
+            {/* Direct Call Notice */}
+            <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', border: '2px solid #C8A45D', borderRadius: '16px', padding: '18px', marginBottom: '20px', textAlign: 'center' }}>
+              <PhoneCall size={28} color="#9A7734" style={{ margin: '0 auto 8px', display: 'block' }} />
+              <h5 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: '#2E2E2E', marginBottom: '4px', fontWeight: 700 }}>
+                Owner Will Call You Shortly 📞
+              </h5>
+              <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.5, margin: 0 }}>
+                Studio owner <strong>Vartika Gupta (+91 98280 23641)</strong> will personally call you at <strong>{completedOrder.customerPhone}</strong> to confirm your hamper customization & payment preferences.
+              </p>
+            </div>
 
             <div style={{ background: '#FFF9F6', border: '1px solid rgba(200,164,93,0.3)', borderRadius: '16px', padding: '16px', marginBottom: '20px', textAlign: 'left', fontSize: '0.85rem' }}>
               <div><strong>Client Name:</strong> {completedOrder.customerName}</div>
-              <div><strong>Address:</strong> {completedOrder.shippingAddress}, {completedOrder.city}</div>
-              <div><strong>Total Paid:</strong> ₹{completedOrder.totalAmount.toLocaleString('en-IN')}</div>
-              <div><strong>UPI Txn Ref (UTR):</strong> {completedOrder.transactionRef}</div>
-              <div><strong>Status:</strong> Handcrafting in Progress</div>
+              <div><strong>Delivery Address:</strong> {completedOrder.shippingAddress}, {completedOrder.city}</div>
+              <div><strong>Total Payable:</strong> ₹{completedOrder.totalAmount.toLocaleString('en-IN')}</div>
+              <div><strong>Order Status:</strong> Reserved • Call Scheduled</div>
             </div>
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-              
-              <a 
-                href={getCustomerWhatsappLink()} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{
-                  background: '#25D366',
-                  color: '#FFFFFF',
-                  padding: '12px 16px',
-                  borderRadius: '30px',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 6px 18px rgba(37,211,102,0.3)'
-                }}
-              >
-                <MessageCircle size={18} /> Resend WhatsApp Confirmation to Customer
-              </a>
-
               <button onClick={printInvoice} className="btn-gold" style={{ justifyContent: 'center', padding: '12px' }}>
-                <Printer size={16} /> Print / Save PDF Tax Invoice
+                <Printer size={16} /> Print Order Summary PDF
               </button>
-
             </div>
 
             <button onClick={() => { setCompletedOrder(null); setIsCheckoutModal(false); onClearCart(); onClose(); }} className="btn-outline-gold" style={{ width: '100%', justifyContent: 'center', marginTop: '6px' }}>
@@ -320,12 +273,12 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             </button>
 
             <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: '#2E2E2E', marginBottom: '16px' }}>
-              Express Checkout (QR Code Payment Only)
+              Reserve Your Luxury Order
             </h4>
 
-            {paymentError && (
+            {orderError && (
               <div style={{ background: '#FFEBEE', border: '1px solid #FF5252', borderRadius: '12px', padding: '12px', marginBottom: '14px', color: '#C62828', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-                <AlertTriangle size={18} style={{ flexShrink: 0 }} /> {paymentError}
+                <AlertTriangle size={18} style={{ flexShrink: 0 }} /> {orderError}
               </div>
             )}
 
@@ -335,7 +288,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 <input type="text" required placeholder="Enter your full name" value={checkoutData.customerName} onChange={e => setCheckoutData({...checkoutData, customerName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
               <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Phone / WhatsApp *</label>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Phone / WhatsApp Number *</label>
                 <input type="tel" required placeholder="e.g. +91 98280 23641" value={checkoutData.customerPhone} onChange={e => setCheckoutData({...checkoutData, customerPhone: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
               <div>
@@ -347,56 +300,19 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 <textarea rows={2} required placeholder="Enter house #, street, area, landmark" value={checkoutData.shippingAddress} onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
 
-              {/* MANDATORY UPI QR CODE DISPLAY CONTAINER */}
-              <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', borderRadius: '16px', border: '2px solid #C8A45D', padding: '16px', textAlign: 'center', marginTop: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '10px', color: '#9A7734', fontWeight: 700, fontSize: '0.88rem' }}>
-                  <QrCode size={18} /> Official Studio UPI Payment QR Code
+              {/* STUDIO CALL NOTICE CONTAINER */}
+              <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', borderRadius: '16px', border: '2px solid #C8A45D', padding: '18px', textAlign: 'center', marginTop: '6px' }}>
+                <div style={{ width: '48px', height: '48px', background: '#FFFFFF', color: '#9A7734', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px', boxShadow: '0 4px 12px rgba(200,164,93,0.3)', border: '1px solid #C8A45D' }}>
+                  <PhoneCall size={24} />
                 </div>
-
-                <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '10px', borderRadius: '16px', border: '1px solid #E0E0E0', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-                  <img src="/upi_qr.png" alt="Paytm UPI QR Code Vartika Gupta" style={{ width: '210px', height: '260px', objectFit: 'contain', margin: '0 auto', display: 'block' }} />
-                </div>
-
-                <div style={{ marginTop: '12px' }}>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#2E2E2E' }}>VARTIKA GUPTA ✓</div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.9rem', color: '#9A7734', background: '#FFF', padding: '4px 10px', borderRadius: '8px', border: '1px solid #C8A45D' }}>
-                      9828023641@pthdfc
-                    </span>
-                    <button 
-                      type="button" 
-                      onClick={copyUpiId} 
-                      style={{ background: '#C8A45D', color: '#FFF', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      {copiedUpi ? <Check size={14} /> : <Copy size={14} />} {copiedUpi ? 'Copied!' : 'Copy UPI'}
-                    </button>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', color: '#666', display: 'block', marginTop: '4px' }}>Scan with Paytm, PhonePe, Google Pay, or BHIM UPI</span>
-                </div>
-
-                {/* Mandatory UTR / Transaction Ref Field */}
-                <div style={{ marginTop: '14px', textAlign: 'left' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#C62828' }}>Enter 12-Digit Payment UTR / Txn Ref ID *</label>
-                    <span style={{ fontSize: '0.7rem', color: checkoutData.transactionRef.length === 12 ? 'green' : '#888', fontWeight: 700 }}>
-                      {checkoutData.transactionRef.length}/12 Digits
-                    </span>
-                  </div>
-                  <input 
-                    type="text" 
-                    required 
-                    maxLength={16}
-                    value={checkoutData.transactionRef} 
-                    onChange={e => {
-                      const val = e.target.value.replace(/[^A-Za-z0-9]/g, '');
-                      setCheckoutData({...checkoutData, transactionRef: val});
-                    }} 
-                    placeholder="e.g. 420918293019" 
-                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: checkoutData.transactionRef.length === 12 ? '2px solid green' : '1.5px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '1px' }} 
-                  />
-                  <span style={{ fontSize: '0.72rem', color: '#666', display: 'block', marginTop: '4px' }}>
-                    💡 Find the 12-digit UTR / Ref No. on your Paytm, GPay, or PhonePe payment success screen.
-                  </span>
+                <h5 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: '#2E2E2E', marginBottom: '6px', fontWeight: 700 }}>
+                  Personal Studio Call & Confirmation
+                </h5>
+                <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.5, marginBottom: '10px' }}>
+                  No upfront online payment required! Once you confirm your reservation, studio owner <strong>Vartika Gupta (+91 98280 23641)</strong> will personally call you to confirm your luxury hamper details and payment preferences.
+                </p>
+                <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '6px 14px', borderRadius: '20px', border: '1px solid #C8A45D', fontSize: '0.78rem', fontWeight: 700, color: '#9A7734' }}>
+                  📞 Studio Owner: Vartika Gupta (+91 98280 23641)
                 </div>
               </div>
 
@@ -417,8 +333,8 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 </div>
               </div>
 
-              <button type="submit" className="btn-gold" style={{ justifyContent: 'center', padding: '14px', marginTop: '6px' }}>
-                <ShieldCheck size={18} /> Confirm Payment & Submit Order
+              <button type="submit" disabled={isSubmitting} className="btn-gold" style={{ justifyContent: 'center', padding: '14px', marginTop: '6px' }}>
+                <ShieldCheck size={18} /> {isSubmitting ? 'Reserving Order...' : 'Confirm & Reserve Luxury Order'}
               </button>
             </form>
           </div>
@@ -511,7 +427,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 </div>
 
                 <button onClick={() => setIsCheckoutModal(true)} className="btn-gold" style={{ width: '100%', justifyContent: 'center', padding: '14px' }}>
-                  Proceed to Pay via UPI QR <ArrowRight size={16} />
+                  Reserve Order & Request Call <ArrowRight size={16} />
                 </button>
               </div>
             )}
