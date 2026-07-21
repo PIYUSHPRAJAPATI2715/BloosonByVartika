@@ -227,55 +227,48 @@ router.get('/orders', async (req, res) => {
   }
 });
 
-// Automated WhatsApp Notification API Dispatcher from Owner's WhatsApp Number (+91 98280 23641)
+// UltraMsg API Instance130248 Integration for Automated Silent WhatsApp Messaging
+const sendUltraMsgWhatsapp = async (toPhone, messageBody) => {
+  try {
+    const cleanPhone = (toPhone || '').replace(/[^0-9]/g, '');
+    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : `+${cleanPhone}`;
+
+    const params = new URLSearchParams();
+    params.append('token', 'yls7zjbopfs9npo9');
+    params.append('to', formattedPhone);
+    params.append('body', messageBody);
+
+    const endpoint = 'https://api.ultramsg.com/instance130248/messages/chat';
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    });
+
+    const data = await res.json();
+    console.log(`📲 [UltraMsg API Success -> ${formattedPhone}]:`, data);
+    return data;
+  } catch (err) {
+    console.error(`❌ [UltraMsg API Error -> ${toPhone}]:`, err);
+  }
+};
+
 const sendAutomatedCustomerWhatsappMessage = async (orderData) => {
   try {
-    const cleanCustomerPhone = (orderData.customerPhone || '').replace(/[^0-9]/g, '');
-    const formattedCustomerPhone = cleanCustomerPhone.length === 10 ? `91${cleanCustomerPhone}` : cleanCustomerPhone;
-
     const itemsText = orderData.items ? orderData.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('\n') : 'Luxury Hamper Set';
     
-    // Automated Message to Customer from Owner's Number (+91 98280 23641)
+    // Automated Message to Customer
     const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
 
-    // Automated Message to Owner Vartika Gupta (+91 98280 23641)
-    const ownerMsg = `🌸 *NEW ORDER RESERVED* 🌸\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal: ₹${orderData.totalAmount}\nItems:\n${itemsText}`;
+    // Automated Message to Owner Numbers (+91 98280 23641 & +91 95493 48495)
+    const ownerMsg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal Amount: ₹${orderData.totalAmount}\n\nItems:\n${itemsText}`;
 
-    console.log("--------------------------------------------------");
-    console.log(`📲 [AUTOMATED WHATSAPP SENT FROM +91 98280 23641 TO CUSTOMER ${formattedCustomerPhone}]`);
-    console.log(customerMsg);
-    console.log("--------------------------------------------------");
-
-    // UltraMsg / Whapi / Twilio automated WhatsApp sender API webhook integration
-    const whatsappApiUrl = process.env.WHATSAPP_API_URL || (process.env.ULTRAMSG_INSTANCE_ID ? `https://api.ultramsg.com/${process.env.ULTRAMSG_INSTANCE_ID}/messages/chat` : null);
-    
-    if (whatsappApiUrl) {
-      // Send to Customer
-      await fetch(whatsappApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: process.env.WHATSAPP_TOKEN || process.env.ULTRAMSG_TOKEN,
-          to: formattedCustomerPhone,
-          body: customerMsg,
-          message: customerMsg
-        })
-      });
-
-      // Send to Owner (+91 98280 23641)
-      await fetch(whatsappApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: process.env.WHATSAPP_TOKEN || process.env.ULTRAMSG_TOKEN,
-          to: '919828023641',
-          body: ownerMsg,
-          message: ownerMsg
-        })
-      });
-    }
+    // Dispatch automatically via UltraMsg API instance130248
+    await sendUltraMsgWhatsapp(orderData.customerPhone, customerMsg);
+    await sendUltraMsgWhatsapp('+919828023641', ownerMsg);
+    await sendUltraMsgWhatsapp('+919549348495', ownerMsg);
   } catch (err) {
-    console.warn("Automated WhatsApp API Error:", err);
+    console.warn("Automated WhatsApp Dispatcher Error:", err);
   }
 };
 
