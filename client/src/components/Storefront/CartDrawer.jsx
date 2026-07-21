@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck, QrCode, Copy, Check, MessageCircle } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, onRemoveItem, onClearCart }) {
@@ -7,13 +7,16 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponMsg, setCouponMsg] = useState(null);
   const [isCheckoutModal, setIsCheckoutModal] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+
   const [checkoutData, setCheckoutData] = useState({
     customerName: 'Radhika Khandelwal',
     customerEmail: 'radhika.k@example.com',
-    customerPhone: '+91 98291 55443',
+    customerPhone: '+91 98280 23641',
     shippingAddress: 'C-42, Malviya Nagar, Near WTP',
     city: 'Jaipur',
-    paymentMethod: 'Razorpay'
+    paymentMethod: 'UPI', // Default to UPI QR Code
+    transactionRef: ''
   });
   const [completedOrder, setCompletedOrder] = useState(null);
 
@@ -21,6 +24,12 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const finalTotal = Math.max(0, subtotal - discountAmount);
+
+  const copyUpiId = () => {
+    navigator.clipboard.writeText('9828023641@pthdfc');
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2500);
+  };
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -81,6 +90,21 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     }
   };
 
+  const getOwnerWhatsappLink = () => {
+    if (!completedOrder) return '#';
+    const itemsText = completedOrder.items.map(i => `• ${i.productName} (x${i.quantity})`).join('%0A');
+    const msg = `🌸 *NEW ORDER ALERT - BLOSSOM BY VARTIKA* 🌸%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Client:* ${completedOrder.customerName}%0A*Phone:* ${completedOrder.customerPhone}%0A*Email:* ${completedOrder.customerEmail}%0A*Address:* ${completedOrder.shippingAddress}, ${completedOrder.city}%0A%0A*Items:*%0A${itemsText}%0A%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Payment Method:* ${completedOrder.paymentMethod}%0A${completedOrder.transactionRef ? `*UPI Txn Ref:* ${completedOrder.transactionRef}` : ''}`;
+    return `https://wa.me/919828023641?text=${msg}`;
+  };
+
+  const getCustomerWhatsappLink = () => {
+    if (!completedOrder) return '#';
+    const cleanPhone = completedOrder.customerPhone.replace(/[^0-9]/g, '');
+    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+    const msg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0ADear ${completedOrder.customerName},%0AThank you for ordering with Blossom by Vartika Jaipur!%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Status:* Crafting in Progress%0A%0ATrack live status anytime: https://blooson-by-vartika.vercel.app/`;
+    return `https://wa.me/${targetPhone}?text=${msg}`;
+  };
+
   const printInvoice = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
@@ -98,34 +122,36 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
             th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
             th { background: #FFF9F6; color: #9A7734; }
-            .total { font-size: 18px; font-weight: bold; text-align: right; padding-top: 20px; }
-            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+            .total { margin-top: 30px; text-align: right; font-size: 18px; font-weight: bold; color: #9A7734; }
           </style>
         </head>
         <body>
           <div class="header">
             <div>
               <div class="brand">Blossom by Vartika</div>
-              <div class="sub">Luxury Trousseau Packaging & Gift Hampers Studio</div>
-              <p style="font-size:12px; margin-top:5px;">Jaipur, Rajasthan • Phone: +91 98290 00000</p>
+              <div class="sub">Jaipur Luxury Trousseau Studio</div>
             </div>
-            <div style="text-align:right;">
-              <h3>INVOICE</h3>
-              <p><strong>Invoice #:</strong> ${completedOrder.orderNumber}</p>
-              <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')}</p>
+            <div>
+              <h2>TAX INVOICE</h2>
+              <div>Invoice #: ${completedOrder.orderNumber}</div>
+              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
             </div>
           </div>
 
           <div class="details">
             <div>
-              <strong>Billed & Shipped To:</strong>
-              <p>${completedOrder.customerName}</p>
-              <p>${completedOrder.shippingAddress}, ${completedOrder.city}</p>
-              <p>Phone: ${completedOrder.customerPhone}</p>
+              <strong>Billed To:</strong><br/>
+              ${completedOrder.customerName}<br/>
+              ${completedOrder.shippingAddress}, ${completedOrder.city}<br/>
+              Phone: ${completedOrder.customerPhone}<br/>
+              Email: ${completedOrder.customerEmail}
             </div>
-            <div style="text-align:right;">
-              <strong>Payment Status:</strong> PAID (${completedOrder.paymentMethod})<br/>
-              <strong>Status:</strong> ${completedOrder.orderStatus || 'Crafting'}
+            <div>
+              <strong>Studio Contact:</strong><br/>
+              Vartika Gupta<br/>
+              Plot 45, Malviya Nagar Luxury Corridor, Jaipur<br/>
+              Phone: +91 98280 23641<br/>
+              Email: vartika1594@gmail.com
             </div>
           </div>
 
@@ -133,19 +159,17 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             <thead>
               <tr>
                 <th>Item Description</th>
-                <th>Edition / Variant</th>
-                <th>Qty</th>
                 <th>Price</th>
+                <th>Qty</th>
                 <th>Total</th>
               </tr>
             </thead>
             <tbody>
               ${completedOrder.items.map(item => `
                 <tr>
-                  <td>${item.productName}</td>
-                  <td>${item.variantName || 'Standard'}</td>
-                  <td>${item.quantity}</td>
+                  <td>${item.productName} ${item.variantName ? `(${item.variantName})` : ''}</td>
                   <td>₹${item.price.toLocaleString('en-IN')}</td>
+                  <td>${item.quantity}</td>
                   <td>₹${(item.price * item.quantity).toLocaleString('en-IN')}</td>
                 </tr>
               `).join('')}
@@ -153,19 +177,18 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
           </table>
 
           <div class="total">
-            <p>Subtotal: ₹${completedOrder.subtotal.toLocaleString('en-IN')}</p>
-            ${completedOrder.discountAmount ? `<p style="color:green;">Discount: -₹${completedOrder.discountAmount.toLocaleString('en-IN')}</p>` : ''}
-            <p style="font-size:22px; color:#9A7734;">Grand Total: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}</p>
+            Total Payable: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}
           </div>
-
-          <div class="footer">
-            <p>🌸 Thank you for choosing Blossom by Vartika! Every gift is handcrafted with love in Jaipur.</p>
+          
+          <div style="margin-top: 50px; text-align: center; color: #777; font-size: 12px;">
+            Thank you for choosing Blossom by Vartika. Handcrafted with love in Jaipur!
           </div>
         </body>
       </html>
     `);
     printWindow.document.close();
-    printWindow.print();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
   };
 
   return (
@@ -193,10 +216,10 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
         }}
       >
         {/* Drawer Header */}
-        <div style={{ padding: '24px', background: '#FFF9F6', borderBottom: '1px solid rgba(200, 164, 93, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '20px 24px', background: '#FFF9F6', borderBottom: '1px solid rgba(200, 164, 93, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <ShoppingBag color="#C8A45D" size={22} />
-            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: '#2E2E2E' }}>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: '#2E2E2E', margin: 0 }}>
               Shopping Bag ({cartItems.reduce((sum, i) => sum + i.quantity, 0)})
             </h3>
           </div>
@@ -205,32 +228,82 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
 
         {/* Drawer Body */}
         {completedOrder ? (
-          <div style={{ padding: '36px', textAlign: 'center', flex: 1, overflowY: 'auto' }}>
+          <div style={{ padding: '28px', textAlign: 'center', flex: 1, overflowY: 'auto' }}>
             <div style={{ width: '60px', height: '60px', background: '#F8E3EC', color: '#C8A45D', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <CheckCircle2 size={32} />
             </div>
-            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#2E2E2E', marginBottom: '8px' }}>
-              Order Confirmed!
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#2E2E2E', marginBottom: '6px' }}>
+              Order Confirmed! 🌸
             </h3>
             <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '16px' }}>
-              Order <strong>#{completedOrder.orderNumber}</strong> has been sent to our Jaipur studio team.
+              Order <strong>#{completedOrder.orderNumber}</strong> has been saved and sent to Jaipur Studio.
             </p>
 
-            <div style={{ background: '#FFF9F6', border: '1px solid rgba(200,164,93,0.3)', borderRadius: '16px', padding: '16px', marginBottom: '24px', textAlign: 'left', fontSize: '0.85rem' }}>
-              <div><strong>Customer:</strong> {completedOrder.customerName}</div>
+            <div style={{ background: '#FFF9F6', border: '1px solid rgba(200,164,93,0.3)', borderRadius: '16px', padding: '16px', marginBottom: '20px', textAlign: 'left', fontSize: '0.85rem' }}>
+              <div><strong>Client Name:</strong> {completedOrder.customerName}</div>
               <div><strong>Address:</strong> {completedOrder.shippingAddress}, {completedOrder.city}</div>
               <div><strong>Total Paid:</strong> ₹{completedOrder.totalAmount.toLocaleString('en-IN')}</div>
-              <div><strong>Status:</strong> Crafting in Progress</div>
+              <div><strong>Payment Method:</strong> {completedOrder.paymentMethod}</div>
+              {completedOrder.transactionRef && <div><strong>UPI Txn Ref:</strong> {completedOrder.transactionRef}</div>}
+              <div><strong>Status:</strong> Handcrafting in Progress</div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button onClick={printInvoice} className="btn-gold" style={{ justifyContent: 'center' }}>
-                <Printer size={16} /> Print / Save PDF Invoice
+            {/* WhatsApp Notification Action Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+              
+              <a 
+                href={getOwnerWhatsappLink()} 
+                target="_blank" 
+                rel="noreferrer"
+                style={{
+                  background: '#25D366',
+                  color: '#FFFFFF',
+                  padding: '12px 16px',
+                  borderRadius: '30px',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 6px 18px rgba(37,211,102,0.3)'
+                }}
+              >
+                <MessageCircle size={18} /> Send WhatsApp Alert to Owner (Vartika)
+              </a>
+
+              <a 
+                href={getCustomerWhatsappLink()} 
+                target="_blank" 
+                rel="noreferrer"
+                style={{
+                  background: '#1E1E1E',
+                  color: '#F4E8C1',
+                  border: '1px solid #C8A45D',
+                  padding: '12px 16px',
+                  borderRadius: '30px',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <MessageCircle size={18} color="#25D366" /> Send WhatsApp Confirmation to Customer
+              </a>
+
+              <button onClick={printInvoice} className="btn-gold" style={{ justifyContent: 'center', padding: '12px' }}>
+                <Printer size={16} /> Print / Save PDF Tax Invoice
               </button>
-              <button onClick={() => { setCompletedOrder(null); setIsCheckoutModal(false); onClearCart(); onClose(); }} className="btn-outline-gold" style={{ justifyContent: 'center' }}>
-                Continue Shopping
-              </button>
+
             </div>
+
+            <button onClick={() => { setCompletedOrder(null); setIsCheckoutModal(false); onClearCart(); onClose(); }} className="btn-outline-gold" style={{ width: '100%', justifyContent: 'center', marginTop: '6px' }}>
+              Continue Shopping
+            </button>
           </div>
         ) : isCheckoutModal ? (
           /* Checkout Form Step */
@@ -239,7 +312,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
               ← Back to Bag Items
             </button>
 
-            <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: '#2E2E2E', marginBottom: '16px' }}>
+            <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: '#2E2E2E', marginBottom: '16px' }}>
               Express Checkout
             </h4>
 
@@ -260,16 +333,57 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Shipping Address *</label>
                 <textarea rows={2} required value={checkoutData.shippingAddress} onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
+
+              {/* Payment Method Selector */}
               <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Payment Method</label>
-                <select value={checkoutData.paymentMethod} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }}>
-                  <option value="Razorpay">Razorpay (Cards, UPI, Netbanking)</option>
-                  <option value="UPI">Direct UPI Transfer (GPay / PhonePe)</option>
-                  <option value="COD">Cash on Delivery (Jaipur Express)</option>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#C8A45D' }}>Payment Method *</label>
+                <select value={checkoutData.paymentMethod} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #C8A45D', outline: 'none', background: '#FFF9F6', fontWeight: 700 }}>
+                  <option value="UPI">Pay via Paytm / PhonePe UPI QR Code (Vartika Gupta)</option>
+                  <option value="Razorpay">Razorpay Online (Credit Card / Netbanking)</option>
+                  <option value="COD">Cash on Delivery (Jaipur Studio Express)</option>
                 </select>
               </div>
 
-              <div style={{ marginTop: '16px', background: '#FFF9F6', padding: '16px', borderRadius: '14px', border: '1px solid rgba(200, 164, 93, 0.4)' }}>
+              {/* UPI QR CODE DISPLAY CONTAINER */}
+              {checkoutData.paymentMethod === 'UPI' && (
+                <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', borderRadius: '16px', border: '2px solid #C8A45D', padding: '16px', textAlign: 'center', marginTop: '4px' }}>
+                  <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '10px', borderRadius: '16px', border: '1px solid #E0E0E0', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+                    <img src="/upi_qr.png" alt="Paytm UPI QR Code Vartika Gupta" style={{ width: '210px', height: '260px', objectFit: 'contain', margin: '0 auto', display: 'block' }} />
+                  </div>
+
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#2E2E2E' }}>VARTIKA GUPTA ✓</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.9rem', color: '#9A7734', background: '#FFF', padding: '4px 10px', borderRadius: '8px', border: '1px solid #C8A45D' }}>
+                        9828023641@pthdfc
+                      </span>
+                      <button 
+                        type="button" 
+                        onClick={copyUpiId} 
+                        style={{ background: '#C8A45D', color: '#FFF', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        {copiedUpi ? <Check size={14} /> : <Copy size={14} />} {copiedUpi ? 'Copied!' : 'Copy UPI'}
+                      </button>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: '#666', display: 'block', marginTop: '4px' }}>Scan with Paytm, PhonePe, Google Pay, or BHIM UPI</span>
+                  </div>
+
+                  {/* Transaction Ref Field */}
+                  <div style={{ marginTop: '14px', textAlign: 'left' }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2E2E2E' }}>Enter Payment UTR / Txn Reference ID *</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={checkoutData.transactionRef} 
+                      onChange={e => setCheckoutData({...checkoutData, transactionRef: e.target.value})} 
+                      placeholder="e.g. 420918293019" 
+                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.88rem', fontWeight: 600 }} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div style={{ marginTop: '10px', background: '#FFF9F6', padding: '14px', borderRadius: '14px', border: '1px solid rgba(200, 164, 93, 0.4)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem' }}>
                   <span>Items Total:</span>
                   <span>₹{subtotal.toLocaleString('en-IN')}</span>
@@ -286,8 +400,8 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 </div>
               </div>
 
-              <button type="submit" className="btn-gold" style={{ justifyContent: 'center', padding: '14px', marginTop: '10px' }}>
-                <ShieldCheck size={18} /> Confirm & Place Luxury Order
+              <button type="submit" className="btn-gold" style={{ justifyContent: 'center', padding: '14px', marginTop: '6px' }}>
+                <ShieldCheck size={18} /> Submit Payment & Confirm Order
               </button>
             </form>
           </div>
@@ -318,76 +432,72 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                       <img src={item.images?.[0] || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=200'} alt="" style={{ width: '70px', height: '70px', borderRadius: '12px', objectFit: 'cover' }} />
                       
                       <div style={{ flex: 1 }}>
-                        <h5 style={{ fontFamily: 'var(--font-serif)', fontSize: '0.98rem', color: '#2E2E2E', margin: 0 }}>{item.name}</h5>
-                        <span style={{ fontSize: '0.75rem', color: '#C8A45D', fontWeight: 600 }}>{item.variant || 'Standard'}</span>
-                        
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                          <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#2E2E2E' }}>₹{item.price.toLocaleString('en-IN')}</div>
-                          
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #ccc', borderRadius: '14px', background: '#FFF' }}>
-                            <button onClick={() => onUpdateQty(index, item.quantity - 1)} style={{ border: 'none', background: 'none', padding: '4px 8px', cursor: 'pointer' }}><Minus size={12} /></button>
-                            <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>{item.quantity}</span>
-                            <button onClick={() => onUpdateQty(index, item.quantity + 1)} style={{ border: 'none', background: 'none', padding: '4px 8px', cursor: 'pointer' }}><Plus size={12} /></button>
-                          </div>
+                        <h5 style={{ fontFamily: 'var(--font-serif)', fontSize: '0.95rem', color: '#2E2E2E', marginBottom: '2px' }}>{item.name}</h5>
+                        {item.variant && <span style={{ fontSize: '0.75rem', color: '#9A7734' }}>{item.variant}</span>}
+                        <div style={{ fontWeight: 700, color: '#C8A45D', fontSize: '0.9rem', marginTop: '4px' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
+                      </div>
 
-                          <button onClick={() => onRemoveItem(index)} style={{ border: 'none', background: 'none', color: '#e53935', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <button onClick={() => onRemoveItem(index)} style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer' }}>
+                          <Trash2 size={16} />
+                        </button>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFF', border: '1px solid #ddd', borderRadius: '20px', padding: '2px 8px' }}>
+                          <button onClick={() => onUpdateQty(index, item.quantity - 1)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><Minus size={12} /></button>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{item.quantity}</span>
+                          <button onClick={() => onUpdateQty(index, item.quantity + 1)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><Plus size={12} /></button>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Promo Code Input */}
+                {/* Promo Coupon Bar */}
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2E2E2E', display: 'block', marginBottom: '6px' }}>
-                    Apply Promo / Coupon Code:
-                  </label>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <input 
-                      type="text"
-                      placeholder="e.g. WELCOME10 or WEDDING1000"
-                      value={couponCode}
-                      onChange={e => setCouponCode(e.target.value)}
-                      style={{ flex: 1, padding: '8px 12px', borderRadius: '12px', border: '1px solid #C8A45D', fontSize: '0.85rem', outline: 'none' }}
+                      type="text" 
+                      placeholder="Promo Code (e.g. WELCOME10)" 
+                      value={couponCode} 
+                      onChange={e => setCouponCode(e.target.value)} 
+                      style={{ flex: 1, padding: '10px 14px', borderRadius: '20px', border: '1px solid #ddd', fontSize: '0.85rem', outline: 'none' }} 
                     />
-                    <button onClick={handleApplyCoupon} className="btn-gold" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
+                    <button onClick={handleApplyCoupon} style={{ background: '#2E2E2E', color: '#F4E8C1', border: 'none', borderRadius: '20px', padding: '0 16px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                       Apply
                     </button>
                   </div>
                   {couponMsg && (
-                    <span style={{ fontSize: '0.78rem', color: couponMsg.type === 'success' ? 'green' : 'red', display: 'block', marginTop: '4px' }}>
+                    <div style={{ fontSize: '0.78rem', marginTop: '6px', color: couponMsg.type === 'success' ? 'green' : 'red', fontWeight: 600 }}>
                       {couponMsg.text}
-                    </span>
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Cart Footer Summary */}
+            {/* Subtotal Footer */}
             {cartItems.length > 0 && (
-              <div style={{ borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
-                  <span>Subtotal:</span>
-                  <span>₹{subtotal.toLocaleString('en-IN')}</span>
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ color: '#777' }}>Subtotal:</span>
+                  <span style={{ fontWeight: 600 }}>₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
                 {discountAmount > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem', color: 'green' }}>
-                    <span>Coupon Savings:</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'green' }}>
+                    <span>Discount:</span>
                     <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: 700, color: '#2E2E2E', marginBottom: '16px' }}>
-                  <span>Grand Total:</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 700, color: '#2E2E2E', marginBottom: '16px' }}>
+                  <span>Estimated Total:</span>
                   <span style={{ color: '#C8A45D' }}>₹{finalTotal.toLocaleString('en-IN')}</span>
                 </div>
 
                 <button onClick={() => setIsCheckoutModal(true)} className="btn-gold" style={{ width: '100%', justifyContent: 'center', padding: '14px' }}>
-                  <span>Proceed to Express Checkout</span>
-                  <ArrowRight size={16} />
+                  Proceed to Pay via UPI QR <ArrowRight size={16} />
                 </button>
               </div>
             )}
-
           </div>
         )}
 
