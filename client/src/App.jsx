@@ -211,18 +211,22 @@ export default function App() {
 
   // Google Analytics Realtime Pageview Event Dispatcher
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('config', 'G-J290RKLB19', {
-        page_title: document.title,
-        page_location: window.location.href,
-        page_path: window.location.pathname
-      });
-      window.gtag('event', 'page_view', {
-        send_to: 'G-J290RKLB19',
-        page_title: document.title,
-        page_location: window.location.href,
-        page_path: window.location.pathname
-      });
+    try {
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('config', 'G-J290RKLB19', {
+          page_title: document.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname
+        });
+        window.gtag('event', 'page_view', {
+          send_to: 'G-J290RKLB19',
+          page_title: document.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname
+        });
+      }
+    } catch (err) {
+      console.warn("Analytics event dispatch fallback:", err);
     }
   }, [activeAdmin, isAllProductsOpen]);
 
