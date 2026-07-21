@@ -236,20 +236,36 @@ const sendUltraMsgWhatsapp = async (toPhone, messageBody) => {
     // UltraMsg requires digits only with country code (e.g. 919828023641), no plus sign
     const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
-    const params = new URLSearchParams();
-    params.append('token', 'yls7zjbopfs9npo9');
-    params.append('to', formattedPhone);
-    params.append('body', messageBody);
+    const payload = {
+      token: 'yls7zjbopfs9npo9',
+      to: formattedPhone,
+      body: messageBody
+    };
 
     const endpoint = 'https://api.ultramsg.com/instance130248/messages/chat';
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
-    console.log(`📲 [UltraMsg API Success -> ${formattedPhone}]:`, data);
+    console.log(`📲 [UltraMsg API JSON Success -> ${formattedPhone}]:`, data);
+    
+    // Fallback try urlencoded if status error
+    if (!res.ok || (data && data.error)) {
+      const params = new URLSearchParams();
+      params.append('token', 'yls7zjbopfs9npo9');
+      params.append('to', formattedPhone);
+      params.append('body', messageBody);
+      
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+    }
+
     return data;
   } catch (err) {
     console.error(`❌ [UltraMsg API Error -> ${toPhone}]:`, err);
