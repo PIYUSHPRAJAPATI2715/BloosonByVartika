@@ -4,16 +4,19 @@ import { getApiUrl } from '../../config/api';
 
 export default function AdminSettings({ onSettingsUpdated }) {
   const [settings, setSettings] = useState({
-    announcementText: "Jaipur Studio Open for Luxury Bridal Trousseau & Festival Bookings",
+    announcementText: "👑 JAIPUR STUDIO OPEN FOR LUXURY BRIDAL TROUSSEAU & FESTIVAL BOOKINGS",
     heroHeading: "Every Gift Tells a Story",
     heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration.",
     tagline: "Luxury Trousseau Packaging | Premium Gift Hampers",
     giftBoxImage: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
     giftBoxTitle: "Tap to Unwrap Luxury",
     giftBoxSubtitle: "Handcrafted Bridal Trousseau Box Set",
-    boutiqueAddress: "Plot 45, Malviya Nagar Luxury Corridor, Jaipur, Rajasthan 302017",
-    boutiquePhone: "+91 98290 00000",
-    boutiqueEmail: "contact@blossombyvartika.com"
+    address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
+    contactPhone: "+91 98280 23641",
+    contactEmail: "vartika1594@gmail.com",
+    boutiqueAddress: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
+    boutiquePhone: "+91 98280 23641",
+    boutiqueEmail: "vartika1594@gmail.com"
   });
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -21,22 +24,40 @@ export default function AdminSettings({ onSettingsUpdated }) {
     fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data) setSettings(data.data);
+        if (data.success && data.data) {
+          const fetched = data.data;
+          setSettings(prev => ({
+            ...prev,
+            ...fetched,
+            boutiqueAddress: fetched.address || fetched.boutiqueAddress || prev.address,
+            boutiquePhone: fetched.contactPhone || fetched.boutiquePhone || prev.contactPhone,
+            boutiqueEmail: fetched.contactEmail || fetched.boutiqueEmail || prev.contactEmail,
+            address: fetched.address || fetched.boutiqueAddress || prev.address,
+            contactPhone: fetched.contactPhone || fetched.boutiquePhone || prev.contactPhone,
+            contactEmail: fetched.contactEmail || fetched.boutiqueEmail || prev.contactEmail
+          }));
+        }
       })
       .catch(err => console.warn("Settings fetch fallback:", err));
   }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const payload = {
+      ...settings,
+      address: settings.boutiqueAddress || settings.address,
+      contactPhone: settings.boutiquePhone || settings.contactPhone,
+      contactEmail: settings.boutiqueEmail || settings.contactEmail
+    };
     try {
       const res = await fetch(getApiUrl('/api/settings'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success && data.data) {
-        setSettings(data.data);
+        setSettings(prev => ({ ...prev, ...data.data }));
         if (onSettingsUpdated) onSettingsUpdated(data.data);
       }
     } catch (err) {
@@ -50,17 +71,17 @@ export default function AdminSettings({ onSettingsUpdated }) {
     <div>
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#F4E8C1', margin: 0 }}>
-          Dynamic Homepage & 3D Hero Customizer
+          Dynamic Homepage & Studio Settings Customizer
         </h1>
         <p style={{ color: '#AAA', fontSize: '0.88rem' }}>
-          Edit 3D gift box teaser images, hero title, announcement text, and boutique contact details live.
+          Edit boutique contact details, address, hero heading, announcement text, and gift box image live.
         </p>
       </div>
 
       <div style={{ background: '#282828', borderRadius: '20px', padding: '28px', border: '1px solid #C8A45D', maxWidth: '780px' }}>
         {savedSuccess && (
           <div style={{ background: '#1B3E2B', color: '#4CAF50', padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-            <CheckCircle2 size={18} /> Website & 3D Gift Box settings updated live!
+            <CheckCircle2 size={18} /> Website & Jaipur Studio settings updated live across all pages!
           </div>
         )}
 
@@ -73,7 +94,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
             </label>
             <input 
               type="text" 
-              value={settings.announcementText} 
+              value={settings.announcementText || ''} 
               onChange={e => setSettings({...settings, announcementText: e.target.value})} 
               style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
             />
@@ -86,7 +107,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
             </label>
             <input 
               type="text" 
-              value={settings.heroHeading} 
+              value={settings.heroHeading || ''} 
               onChange={e => setSettings({...settings, heroHeading: e.target.value})} 
               style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
             />
@@ -98,7 +119,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
             </label>
             <textarea 
               rows={2}
-              value={settings.heroSubheading} 
+              value={settings.heroSubheading || ''} 
               onChange={e => setSettings({...settings, heroSubheading: e.target.value})} 
               style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
             />
@@ -147,16 +168,16 @@ export default function AdminSettings({ onSettingsUpdated }) {
             </div>
           </div>
 
-          {/* Contact Details */}
+          {/* Studio Contact Details */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <div>
               <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#C8A45D', display: 'block', marginBottom: '6px' }}>
-                Boutique Contact Phone
+                Boutique Contact Phone / WhatsApp
               </label>
               <input 
                 type="text" 
-                value={settings.boutiquePhone} 
-                onChange={e => setSettings({...settings, boutiquePhone: e.target.value})} 
+                value={settings.boutiquePhone || ''} 
+                onChange={e => setSettings({...settings, boutiquePhone: e.target.value, contactPhone: e.target.value})} 
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
               />
             </div>
@@ -166,8 +187,8 @@ export default function AdminSettings({ onSettingsUpdated }) {
               </label>
               <input 
                 type="text" 
-                value={settings.boutiqueEmail} 
-                onChange={e => setSettings({...settings, boutiqueEmail: e.target.value})} 
+                value={settings.boutiqueEmail || ''} 
+                onChange={e => setSettings({...settings, boutiqueEmail: e.target.value, contactEmail: e.target.value})} 
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
               />
             </div>
@@ -179,8 +200,8 @@ export default function AdminSettings({ onSettingsUpdated }) {
             </label>
             <input 
               type="text" 
-              value={settings.boutiqueAddress} 
-              onChange={e => setSettings({...settings, boutiqueAddress: e.target.value})} 
+              value={settings.boutiqueAddress || ''} 
+              onChange={e => setSettings({...settings, boutiqueAddress: e.target.value, address: e.target.value})} 
               style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
             />
           </div>

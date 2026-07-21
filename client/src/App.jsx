@@ -50,9 +50,12 @@ export default function App() {
 
   // Dynamic Settings State
   const [websiteSettings, setWebsiteSettings] = useState({
-    announcementText: "Jaipur Studio Open for Luxury Bridal Trousseau & Festival Bookings",
+    announcementText: "👑 JAIPUR STUDIO OPEN FOR LUXURY BRIDAL TROUSSEAU & FESTIVAL BOOKINGS",
     heroHeading: "Every Gift Tells a Story",
-    heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration."
+    heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
+    contactEmail: "vartika1594@gmail.com",
+    contactPhone: "+91 98280 23641",
+    address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021"
   });
   
   const [products, setProducts] = useState([
@@ -195,6 +198,18 @@ export default function App() {
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isAllProductsOpen, setIsAllProductsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Fetch Website Settings from Backend API
+  useEffect(() => {
+    fetch(getApiUrl('/api/settings'))
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) {
+          setWebsiteSettings(prev => ({ ...prev, ...data.data }));
+        }
+      })
+      .catch(err => console.warn("Failed to load settings:", err));
+  }, []);
 
   // Keyboard shortcut listener Ctrl + Alt + A for Admin login
   useEffect(() => {
@@ -406,12 +421,13 @@ export default function App() {
 
           <InstagramFeed />
 
-          <ContactSection />
+          <ContactSection websiteSettings={websiteSettings} />
 
           <Footer 
             onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
             onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
             onOpenQuiz={() => setIsQuizOpen(true)}
+            websiteSettings={websiteSettings}
           />
         </div>
       )}

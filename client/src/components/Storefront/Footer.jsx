@@ -1,7 +1,11 @@
 import React from 'react';
 import { Heart, Instagram, Facebook, Phone, Mail, MapPin } from 'lucide-react';
 
-export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz }) {
+export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz, websiteSettings }) {
+  const address = websiteSettings?.address || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
+  const phone = websiteSettings?.contactPhone || "+91 98280 23641";
+  const email = websiteSettings?.contactEmail || "vartika1594@gmail.com";
+
   return (
     <footer style={{ background: '#2E2E2E', color: '#FFFFFF', paddingTop: '70px', paddingBottom: '30px', borderTop: '3px solid #C8A45D' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
@@ -51,9 +55,9 @@ export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQ
           {/* Contact Details */}
           <div>
             <h4 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.1rem', marginBottom: '16px' }}>Jaipur Studio</h4>
-            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📍 Malviya Nagar, Jaipur, Rajasthan 302017</p>
-            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📞 +91 98290 00000 / +91 94140 11111</p>
-            <p style={{ color: '#CCC', fontSize: '0.85rem' }}>✉️ contact@blossombyvartika.com</p>
+            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📍 {address}</p>
+            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📞 {phone}</p>
+            <p style={{ color: '#CCC', fontSize: '0.85rem' }}>✉️ {email}</p>
           </div>
 
         </div>

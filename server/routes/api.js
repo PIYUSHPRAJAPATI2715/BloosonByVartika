@@ -7,7 +7,7 @@ const Category = require('../models/Category');
 const Order = require('../models/Order');
 const CustomOrder = require('../models/CustomOrder');
 const User = require('../models/User');
-const Settings = require('../models/Settings');
+const Setting = require('../models/Setting');
 const { Inquiry, Coupon, Banner, Review, CalendarEvent } = require('../models/AuxiliaryModels');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'blossom_luxury_secret_key_2026_jaipur';
@@ -510,6 +510,50 @@ router.get('/admin/stats', async (req, res) => {
         totalProducts: 18
       }
     });
+  }
+});
+
+// --- WEBSITE SETTINGS ---
+router.get('/settings', async (req, res) => {
+  try {
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = await Setting.create({
+        announcementText: "👑 JAIPUR STUDIO OPEN FOR LUXURY BRIDAL TROUSSEAU & FESTIVAL BOOKINGS",
+        heroHeading: "Every Gift Tells a Story",
+        heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
+        contactEmail: "vartika1594@gmail.com",
+        contactPhone: "+91 98280 23641",
+        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021"
+      });
+    }
+    res.json({ success: true, data: settings });
+  } catch (err) {
+    res.json({
+      success: true,
+      data: {
+        announcementText: "👑 JAIPUR STUDIO OPEN FOR LUXURY BRIDAL TROUSSEAU & FESTIVAL BOOKINGS",
+        heroHeading: "Every Gift Tells a Story",
+        heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
+        contactEmail: "vartika1594@gmail.com",
+        contactPhone: "+91 98280 23641",
+        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021"
+      }
+    });
+  }
+});
+
+router.put('/settings', async (req, res) => {
+  try {
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = await Setting.create(req.body);
+    } else {
+      settings = await Setting.findByIdAndUpdate(settings._id, req.body, { new: true });
+    }
+    res.json({ success: true, data: settings });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 });
 
