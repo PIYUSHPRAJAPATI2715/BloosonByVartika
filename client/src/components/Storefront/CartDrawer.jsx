@@ -75,9 +75,13 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     e.preventDefault();
     setPaymentError(null);
 
-    // STRICT PAYMENT GUARD: UTR Reference ID must be provided and valid
-    if (!checkoutData.transactionRef || checkoutData.transactionRef.trim().length < 6) {
-      setPaymentError('Payment Verification Required: Please scan Vartika Gupta\'s Paytm UPI QR Code and enter your valid UTR Transaction Reference ID.');
+    const utrRaw = (checkoutData.transactionRef || '').trim().replace(/\s+/g, '');
+
+    // STRICT 12-DIGIT UTR VALIDATION: Must be exactly 12 numeric digits or 12-16 alphanumeric reference ID
+    const isValidUtr = /^[0-9]{12}$/.test(utrRaw) || /^[A-Za-z0-9]{12,16}$/.test(utrRaw);
+
+    if (!utrRaw || !isValidUtr) {
+      setPaymentError('❌ Invalid UTR Transaction ID: Please enter a valid 12-digit numeric UPI UTR / RRN (e.g. 420918293019) shown on your Paytm, PhonePe, or Google Pay payment receipt.');
       return;
     }
 
@@ -365,15 +369,27 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
 
                 {/* Mandatory UTR / Transaction Ref Field */}
                 <div style={{ marginTop: '14px', textAlign: 'left' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#C62828' }}>Enter 12-Digit Payment UTR / Txn Ref ID *</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#C62828' }}>Enter 12-Digit Payment UTR / Txn Ref ID *</label>
+                    <span style={{ fontSize: '0.7rem', color: checkoutData.transactionRef.length === 12 ? 'green' : '#888', fontWeight: 700 }}>
+                      {checkoutData.transactionRef.length}/12 Digits
+                    </span>
+                  </div>
                   <input 
                     type="text" 
                     required 
+                    maxLength={16}
                     value={checkoutData.transactionRef} 
-                    onChange={e => setCheckoutData({...checkoutData, transactionRef: e.target.value})} 
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^A-Za-z0-9]/g, '');
+                      setCheckoutData({...checkoutData, transactionRef: val});
+                    }} 
                     placeholder="e.g. 420918293019" 
-                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.88rem', fontWeight: 600 }} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: checkoutData.transactionRef.length === 12 ? '2px solid green' : '1.5px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.9rem', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '1px' }} 
                   />
+                  <span style={{ fontSize: '0.72rem', color: '#666', display: 'block', marginTop: '4px' }}>
+                    💡 Find the 12-digit UTR / Ref No. on your Paytm, GPay, or PhonePe payment success screen.
+                  </span>
                 </div>
               </div>
 
