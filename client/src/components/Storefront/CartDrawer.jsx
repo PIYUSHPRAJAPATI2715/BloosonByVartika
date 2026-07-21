@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck, QrCode, Copy, Check, MessageCircle } from 'lucide-react';
+import { X, Trash2, Plus, Minus, Tag, ShoppingBag, ArrowRight, Printer, CheckCircle2, ShieldCheck, QrCode, Copy, Check, MessageCircle, AlertTriangle } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, onRemoveItem, onClearCart }) {
@@ -8,6 +8,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
   const [couponMsg, setCouponMsg] = useState(null);
   const [isCheckoutModal, setIsCheckoutModal] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
 
   const [checkoutData, setCheckoutData] = useState({
     customerName: '',
@@ -15,7 +16,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     customerPhone: '',
     shippingAddress: '',
     city: 'Jaipur',
-    paymentMethod: 'UPI', // Default to UPI QR Code
+    paymentMethod: 'Paytm UPI QR Code (Vartika Gupta)',
     transactionRef: ''
   });
   const [completedOrder, setCompletedOrder] = useState(null);
@@ -62,8 +63,24 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     }
   };
 
+  const triggerAutomaticWhatsapp = (order) => {
+    const itemsText = order.items.map(i => `• ${i.productName} (x${i.quantity})`).join('%0A');
+    const msg = `🌸 *NEW UPI ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0A*Order %23:* ${order.orderNumber}%0A*Client:* ${order.customerName}%0A*Phone:* ${order.customerPhone}%0A*Email:* ${order.customerEmail}%0A*Address:* ${order.shippingAddress}, ${order.city}%0A%0A*Items Purchased:*%0A${itemsText}%0A%0A*Total Paid:* ₹${order.totalAmount.toLocaleString('en-IN')}%0A*Payment Method:* Paytm / UPI QR Code%0A*UPI Txn Ref (UTR):* ${order.transactionRef}`;
+    
+    // Auto-open WhatsApp link for owner alert
+    window.open(`https://wa.me/919828023641?text=${msg}`, '_blank');
+  };
+
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+    setPaymentError(null);
+
+    // STRICT PAYMENT GUARD: UTR Reference ID must be provided and valid
+    if (!checkoutData.transactionRef || checkoutData.transactionRef.trim().length < 6) {
+      setPaymentError('Payment Verification Required: Please scan Vartika Gupta\'s Paytm UPI QR Code and enter your valid UTR Transaction Reference ID.');
+      return;
+    }
+
     const orderPayload = {
       ...checkoutData,
       items: cartItems.map(i => ({ productName: i.name, variantName: i.variant, price: i.price, quantity: i.quantity, image: i.images?.[0] })),
@@ -80,28 +97,26 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
         body: JSON.stringify(orderPayload)
       });
       const data = await res.json();
+      let createdOrder;
       if (data.success && data.data) {
-        setCompletedOrder(data.data);
+        createdOrder = data.data;
       } else {
-        setCompletedOrder({ ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) });
+        createdOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
       }
+      setCompletedOrder(createdOrder);
+      triggerAutomaticWhatsapp(createdOrder);
     } catch (err) {
-      setCompletedOrder({ ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) });
+      const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
+      setCompletedOrder(fallbackOrder);
+      triggerAutomaticWhatsapp(fallbackOrder);
     }
-  };
-
-  const getOwnerWhatsappLink = () => {
-    if (!completedOrder) return '#';
-    const itemsText = completedOrder.items.map(i => `• ${i.productName} (x${i.quantity})`).join('%0A');
-    const msg = `🌸 *NEW ORDER ALERT - BLOSSOM BY VARTIKA* 🌸%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Client:* ${completedOrder.customerName}%0A*Phone:* ${completedOrder.customerPhone}%0A*Email:* ${completedOrder.customerEmail}%0A*Address:* ${completedOrder.shippingAddress}, ${completedOrder.city}%0A%0A*Items:*%0A${itemsText}%0A%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Payment Method:* ${completedOrder.paymentMethod}%0A${completedOrder.transactionRef ? `*UPI Txn Ref:* ${completedOrder.transactionRef}` : ''}`;
-    return `https://wa.me/919828023641?text=${msg}`;
   };
 
   const getCustomerWhatsappLink = () => {
     if (!completedOrder) return '#';
     const cleanPhone = completedOrder.customerPhone.replace(/[^0-9]/g, '');
     const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    const msg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0ADear ${completedOrder.customerName},%0AThank you for ordering with Blossom by Vartika Jaipur!%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Status:* Crafting in Progress%0A%0ATrack live status anytime: https://blooson-by-vartika.vercel.app/`;
+    const msg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0ADear ${completedOrder.customerName},%0AThank you for ordering with Blossom by Vartika Jaipur!%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Total Paid:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*UPI Txn Ref:* ${completedOrder.transactionRef}%0A*Status:* Handcrafting in Progress%0A%0ATrack live status anytime: https://blooson-by-vartika.vercel.app/`;
     return `https://wa.me/${targetPhone}?text=${msg}`;
   };
 
@@ -176,8 +191,12 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             </tbody>
           </table>
 
+          <div style="margin-top: 20px; font-size: 14px;">
+            <strong>UPI Txn Ref (UTR):</strong> ${completedOrder.transactionRef}
+          </div>
+
           <div class="total">
-            Total Payable: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}
+            Total Paid: ₹${completedOrder.totalAmount.toLocaleString('en-IN')}
           </div>
           
           <div style="margin-top: 50px; text-align: center; color: #777; font-size: 12px;">
@@ -233,26 +252,25 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
               <CheckCircle2 size={32} />
             </div>
             <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#2E2E2E', marginBottom: '6px' }}>
-              Order Confirmed! 🌸
+              Payment & Order Successful! 🌸
             </h3>
             <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '16px' }}>
-              Order <strong>#{completedOrder.orderNumber}</strong> has been saved and sent to Jaipur Studio.
+              Order <strong>#{completedOrder.orderNumber}</strong> confirmed and sent to Vartika Gupta via WhatsApp!
             </p>
 
             <div style={{ background: '#FFF9F6', border: '1px solid rgba(200,164,93,0.3)', borderRadius: '16px', padding: '16px', marginBottom: '20px', textAlign: 'left', fontSize: '0.85rem' }}>
               <div><strong>Client Name:</strong> {completedOrder.customerName}</div>
               <div><strong>Address:</strong> {completedOrder.shippingAddress}, {completedOrder.city}</div>
               <div><strong>Total Paid:</strong> ₹{completedOrder.totalAmount.toLocaleString('en-IN')}</div>
-              <div><strong>Payment Method:</strong> {completedOrder.paymentMethod}</div>
-              {completedOrder.transactionRef && <div><strong>UPI Txn Ref:</strong> {completedOrder.transactionRef}</div>}
+              <div><strong>UPI Txn Ref (UTR):</strong> {completedOrder.transactionRef}</div>
               <div><strong>Status:</strong> Handcrafting in Progress</div>
             </div>
 
-            {/* WhatsApp Notification Action Buttons */}
+            {/* Action Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
               
               <a 
-                href={getOwnerWhatsappLink()} 
+                href={getCustomerWhatsappLink()} 
                 target="_blank" 
                 rel="noreferrer"
                 style={{
@@ -270,29 +288,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                   boxShadow: '0 6px 18px rgba(37,211,102,0.3)'
                 }}
               >
-                <MessageCircle size={18} /> Send WhatsApp Alert to Owner (Vartika)
-              </a>
-
-              <a 
-                href={getCustomerWhatsappLink()} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{
-                  background: '#1E1E1E',
-                  color: '#F4E8C1',
-                  border: '1px solid #C8A45D',
-                  padding: '12px 16px',
-                  borderRadius: '30px',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >
-                <MessageCircle size={18} color="#25D366" /> Send WhatsApp Confirmation to Customer
+                <MessageCircle size={18} /> Resend WhatsApp Confirmation to Customer
               </a>
 
               <button onClick={printInvoice} className="btn-gold" style={{ justifyContent: 'center', padding: '12px' }}>
@@ -313,8 +309,14 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             </button>
 
             <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', color: '#2E2E2E', marginBottom: '16px' }}>
-              Express Checkout
+              Express Checkout (QR Code Payment Only)
             </h4>
+
+            {paymentError && (
+              <div style={{ background: '#FFEBEE', border: '1px solid #FF5252', borderRadius: '12px', padding: '12px', marginBottom: '14px', color: '#C62828', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
+                <AlertTriangle size={18} style={{ flexShrink: 0 }} /> {paymentError}
+              </div>
+            )}
 
             <form onSubmit={handlePlaceOrder} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
@@ -334,54 +336,46 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
                 <textarea rows={2} required placeholder="Enter house #, street, area, landmark" value={checkoutData.shippingAddress} onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
 
-              {/* Payment Method Selector */}
-              <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#C8A45D' }}>Payment Method *</label>
-                <select value={checkoutData.paymentMethod} onChange={e => setCheckoutData({...checkoutData, paymentMethod: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #C8A45D', outline: 'none', background: '#FFF9F6', fontWeight: 700 }}>
-                  <option value="UPI">Pay via Paytm / PhonePe UPI QR Code (Vartika Gupta)</option>
-                  <option value="Razorpay">Razorpay Online (Credit Card / Netbanking)</option>
-                  <option value="COD">Cash on Delivery (Jaipur Studio Express)</option>
-                </select>
-              </div>
-
-              {/* UPI QR CODE DISPLAY CONTAINER */}
-              {checkoutData.paymentMethod === 'UPI' && (
-                <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', borderRadius: '16px', border: '2px solid #C8A45D', padding: '16px', textAlign: 'center', marginTop: '4px' }}>
-                  <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '10px', borderRadius: '16px', border: '1px solid #E0E0E0', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-                    <img src="/upi_qr.png" alt="Paytm UPI QR Code Vartika Gupta" style={{ width: '210px', height: '260px', objectFit: 'contain', margin: '0 auto', display: 'block' }} />
-                  </div>
-
-                  <div style={{ marginTop: '12px' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#2E2E2E' }}>VARTIKA GUPTA ✓</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.9rem', color: '#9A7734', background: '#FFF', padding: '4px 10px', borderRadius: '8px', border: '1px solid #C8A45D' }}>
-                        9828023641@pthdfc
-                      </span>
-                      <button 
-                        type="button" 
-                        onClick={copyUpiId} 
-                        style={{ background: '#C8A45D', color: '#FFF', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                      >
-                        {copiedUpi ? <Check size={14} /> : <Copy size={14} />} {copiedUpi ? 'Copied!' : 'Copy UPI'}
-                      </button>
-                    </div>
-                    <span style={{ fontSize: '0.75rem', color: '#666', display: 'block', marginTop: '4px' }}>Scan with Paytm, PhonePe, Google Pay, or BHIM UPI</span>
-                  </div>
-
-                  {/* Transaction Ref Field */}
-                  <div style={{ marginTop: '14px', textAlign: 'left' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2E2E2E' }}>Enter Payment UTR / Txn Reference ID *</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={checkoutData.transactionRef} 
-                      onChange={e => setCheckoutData({...checkoutData, transactionRef: e.target.value})} 
-                      placeholder="e.g. 420918293019" 
-                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.88rem', fontWeight: 600 }} 
-                    />
-                  </div>
+              {/* MANDATORY UPI QR CODE DISPLAY CONTAINER */}
+              <div style={{ background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', borderRadius: '16px', border: '2px solid #C8A45D', padding: '16px', textAlign: 'center', marginTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '10px', color: '#9A7734', fontWeight: 700, fontSize: '0.88rem' }}>
+                  <QrCode size={18} /> Official Studio UPI Payment QR Code
                 </div>
-              )}
+
+                <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '10px', borderRadius: '16px', border: '1px solid #E0E0E0', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
+                  <img src="/upi_qr.png" alt="Paytm UPI QR Code Vartika Gupta" style={{ width: '210px', height: '260px', objectFit: 'contain', margin: '0 auto', display: 'block' }} />
+                </div>
+
+                <div style={{ marginTop: '12px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#2E2E2E' }}>VARTIKA GUPTA ✓</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '4px' }}>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.9rem', color: '#9A7734', background: '#FFF', padding: '4px 10px', borderRadius: '8px', border: '1px solid #C8A45D' }}>
+                      9828023641@pthdfc
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={copyUpiId} 
+                      style={{ background: '#C8A45D', color: '#FFF', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      {copiedUpi ? <Check size={14} /> : <Copy size={14} />} {copiedUpi ? 'Copied!' : 'Copy UPI'}
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: '#666', display: 'block', marginTop: '4px' }}>Scan with Paytm, PhonePe, Google Pay, or BHIM UPI</span>
+                </div>
+
+                {/* Mandatory UTR / Transaction Ref Field */}
+                <div style={{ marginTop: '14px', textAlign: 'left' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#C62828' }}>Enter 12-Digit Payment UTR / Txn Ref ID *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={checkoutData.transactionRef} 
+                    onChange={e => setCheckoutData({...checkoutData, transactionRef: e.target.value})} 
+                    placeholder="e.g. 420918293019" 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #9A7734', background: '#FFF', outline: 'none', fontSize: '0.88rem', fontWeight: 600 }} 
+                  />
+                </div>
+              </div>
 
               <div style={{ marginTop: '10px', background: '#FFF9F6', padding: '14px', borderRadius: '14px', border: '1px solid rgba(200, 164, 93, 0.4)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem' }}>
@@ -401,7 +395,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
               </div>
 
               <button type="submit" className="btn-gold" style={{ justifyContent: 'center', padding: '14px', marginTop: '6px' }}>
-                <ShieldCheck size={18} /> Submit Payment & Confirm Order
+                <ShieldCheck size={18} /> Confirm Payment & Submit Order
               </button>
             </form>
           </div>
