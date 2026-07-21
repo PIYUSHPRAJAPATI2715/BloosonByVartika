@@ -10,10 +10,10 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
   const [copiedUpi, setCopiedUpi] = useState(false);
 
   const [checkoutData, setCheckoutData] = useState({
-    customerName: 'Radhika Khandelwal',
-    customerEmail: 'radhika.k@example.com',
-    customerPhone: '+91 98280 23641',
-    shippingAddress: 'C-42, Malviya Nagar, Near WTP',
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    shippingAddress: '',
     city: 'Jaipur',
     paymentMethod: 'UPI', // Default to UPI QR Code
     transactionRef: ''
@@ -319,19 +319,19 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
             <form onSubmit={handlePlaceOrder} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Full Name *</label>
-                <input type="text" required value={checkoutData.customerName} onChange={e => setCheckoutData({...checkoutData, customerName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
+                <input type="text" required placeholder="Enter your full name" value={checkoutData.customerName} onChange={e => setCheckoutData({...checkoutData, customerName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
               <div>
                 <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Phone / WhatsApp *</label>
-                <input type="tel" required value={checkoutData.customerPhone} onChange={e => setCheckoutData({...checkoutData, customerPhone: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
+                <input type="tel" required placeholder="e.g. +91 98280 23641" value={checkoutData.customerPhone} onChange={e => setCheckoutData({...checkoutData, customerPhone: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
               <div>
                 <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Email Address *</label>
-                <input type="email" required value={checkoutData.customerEmail} onChange={e => setCheckoutData({...checkoutData, customerEmail: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
+                <input type="email" required placeholder="e.g. name@example.com" value={checkoutData.customerEmail} onChange={e => setCheckoutData({...checkoutData, customerEmail: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
               <div>
                 <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>Shipping Address *</label>
-                <textarea rows={2} required value={checkoutData.shippingAddress} onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
+                <textarea rows={2} required placeholder="Enter house #, street, area, landmark" value={checkoutData.shippingAddress} onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc', outline: 'none', background: '#FFF9F6' }} />
               </div>
 
               {/* Payment Method Selector */}
