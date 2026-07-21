@@ -188,21 +188,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     setTimeout(() => printWindow.print(), 500);
   };
 
-  const getOwnerWhatsappLink = () => {
-    if (!completedOrder) return '#';
-    const itemsText = completedOrder.items ? completedOrder.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('%0A') : '';
-    const msg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Client:* ${completedOrder.customerName}%0A*Phone:* ${completedOrder.customerPhone}%0A*Email:* ${completedOrder.customerEmail}%0A*Address:* ${completedOrder.shippingAddress}, ${completedOrder.city}%0A%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Items:*%0A${itemsText}`;
-    return `https://wa.me/919828023641?text=${msg}`;
-  };
 
-  const getCustomerWhatsappLink = () => {
-    if (!completedOrder) return '#';
-    const cleanPhone = completedOrder.customerPhone.replace(/[^0-9]/g, '');
-    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    const itemsText = completedOrder.items ? completedOrder.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('%0A') : '';
-    const msg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸%0A%0ADear ${completedOrder.customerName},%0AThank you for choosing Blossom by Vartika Jaipur!%0A%0A*Order %23:* ${completedOrder.orderNumber}%0A*Total Amount:* ₹${completedOrder.totalAmount.toLocaleString('en-IN')}%0A*Status:* Reserved • Owner Call Scheduled%0A%0AItems Reserved:%0A${itemsText}%0A%0ATrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
-    return `https://wa.me/${targetPhone}?text=${msg}`;
-  };
 
   return (
     <div 
@@ -272,50 +258,6 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-              <a 
-                href={getCustomerWhatsappLink()} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{
-                  background: '#25D366',
-                  color: '#FFFFFF',
-                  padding: '12px 16px',
-                  borderRadius: '30px',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 6px 18px rgba(37,211,102,0.3)'
-                }}
-              >
-                <MessageCircle size={18} /> Send WhatsApp Confirmation to Customer
-              </a>
-
-              <a 
-                href={getOwnerWhatsappLink()} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{
-                  background: '#1E1E1E',
-                  color: '#F4E8C1',
-                  border: '1px solid #C8A45D',
-                  padding: '12px 16px',
-                  borderRadius: '30px',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >
-                <MessageCircle size={18} color="#25D366" /> Send Direct WhatsApp Alert to Owner (Vartika)
-              </a>
-
               <button onClick={printInvoice} className="btn-gold" style={{ justifyContent: 'center', padding: '12px' }}>
                 <Printer size={16} /> Print Order Summary PDF
               </button>
