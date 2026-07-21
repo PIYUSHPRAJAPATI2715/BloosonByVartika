@@ -319,13 +319,6 @@ router.post('/orders', async (req, res) => {
   }
 });
 
-    res.status(201).json({ success: true, data: newOrder });
-  } catch (err) {
-    console.error("Order creation error:", err);
-    res.status(400).json({ success: false, message: err.message });
-  }
-});
-
 router.put('/orders/:id/status', async (req, res) => {
   try {
     const { orderStatus, trackingNumber } = req.body;
