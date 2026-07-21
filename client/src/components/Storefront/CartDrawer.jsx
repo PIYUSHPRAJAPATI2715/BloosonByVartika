@@ -101,18 +101,16 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
         body: JSON.stringify(orderPayload)
       });
       const data = await res.json();
-      let createdOrder;
       if (data.success && data.data) {
-        createdOrder = data.data;
+        setCompletedOrder(data.data);
       } else {
-        createdOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
+        // BACKEND REJECTED ORDER (e.g. Fake or Duplicate UTR)
+        setPaymentError(data.message || 'Payment Verification Failed: Reused or fake UTR reference ID.');
+        return;
       }
-      setCompletedOrder(createdOrder);
-      triggerAutomaticWhatsapp(createdOrder);
     } catch (err) {
-      const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
-      setCompletedOrder(fallbackOrder);
-      triggerAutomaticWhatsapp(fallbackOrder);
+      setPaymentError('Connection Error: Unable to verify payment UTR with studio server.');
+      return;
     }
   };
 

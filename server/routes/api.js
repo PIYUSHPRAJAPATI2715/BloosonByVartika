@@ -227,12 +227,73 @@ router.get('/orders', async (req, res) => {
   }
 });
 
+// Helper function for Silent Backend WhatsApp API Notifications (No Popup Window)
+const sendSilentWhatsappNotification = async (orderData) => {
+  try {
+    const itemsText = orderData.items ? orderData.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('\n') : 'Bridal Hamper Set';
+    const ownerMsg = `🌸 *NEW UPI ORDER RECEIVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\n\nItems:\n${itemsText}\n\nTotal Paid: ₹${orderData.totalAmount}\nPayment: Paytm / UPI QR Code\nUTR Txn ID: ${orderData.transactionRef}\nPayment Status: Verification Pending against Bank Statement`;
+
+    console.log("--------------------------------------------------");
+    console.log("📲 [AUTOMATED SILENT WHATSAPP API SENT TO OWNER +91 98280 23641]");
+    console.log(ownerMsg);
+    console.log("--------------------------------------------------");
+
+    // If external WhatsApp API (Twilio / UltraMsg / WATI) webhook URL is configured:
+    if (process.env.WHATSAPP_API_URL) {
+      await fetch(process.env.WHATSAPP_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: '919828023641',
+          customerPhone: orderData.customerPhone,
+          message: ownerMsg
+        })
+      });
+    }
+  } catch (err) {
+    console.warn("Silent WhatsApp API error:", err);
+  }
+};
+
 router.post('/orders', async (req, res) => {
   try {
+    const { transactionRef, customerName, customerPhone, totalAmount } = req.body;
+    
+    // 1. STRICT UTR REFERENCE FORMAT VALIDATION
+    const cleanUtr = (transactionRef || '').trim().replace(/\s+/g, '');
+    const isValidUtr = /^[0-9]{12}$/.test(cleanUtr) || /^[A-Za-z0-9]{12,16}$/.test(cleanUtr);
+    
+    if (!cleanUtr || !isValidUtr) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "❌ Payment Validation Error: Invalid UTR Transaction ID. Please enter a valid 12-digit numeric UPI UTR / RRN (e.g. 420918293019) from your Paytm, PhonePe, or Google Pay receipt." 
+      });
+    }
+
+    // 2. ANTI-FRAUD DUPLICATE UTR VERIFICATION
+    const duplicateUtr = await Order.findOne({ transactionRef: cleanUtr });
+    if (duplicateUtr) {
+      return res.status(400).json({
+        success: false,
+        message: `❌ Payment Fraud Prevention: UTR ID ${cleanUtr} has already been submitted for Order #${duplicateUtr.orderNumber}. Reusing UTR numbers is prohibited.`
+      });
+    }
+
+    // 3. CREATE ORDER WITH VERIFICATION STATUS
     const orderNumber = 'BVL-' + Math.floor(100000 + Math.random() * 900000);
-    const order = await Order.create({ ...req.body, orderNumber });
-    res.status(201).json({ success: true, data: order });
+    const newOrder = await Order.create({ 
+      ...req.body, 
+      transactionRef: cleanUtr,
+      orderNumber, 
+      paymentStatus: 'Verification Pending (UTR Submitted)' 
+    });
+
+    // 4. TRIGGER SILENT BACKGROUND WHATSAPP API NOTIFICATION
+    sendSilentWhatsappNotification(newOrder);
+
+    res.status(201).json({ success: true, data: newOrder });
   } catch (err) {
+    console.error("Order creation error:", err);
     res.status(400).json({ success: false, message: err.message });
   }
 });
