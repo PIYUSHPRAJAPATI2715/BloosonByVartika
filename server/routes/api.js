@@ -236,39 +236,23 @@ const sendUltraMsgWhatsapp = async (toPhone, messageBody) => {
     // UltraMsg requires digits only with country code (e.g. 919828023641), no plus sign
     const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
-    const payload = {
-      token: 'yls7zjbopfs9npo9',
-      to: formattedPhone,
-      body: messageBody
-    };
+    const params = new URLSearchParams();
+    params.append('token', 'yls7zjbopfs9npo9');
+    params.append('to', formattedPhone);
+    params.append('body', messageBody);
 
     const endpoint = 'https://api.ultramsg.com/instance130248/messages/chat';
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
     });
 
-    const data = await res.json();
-    console.log(`📲 [UltraMsg API JSON Success -> ${formattedPhone}]:`, data);
-    
-    // Fallback try urlencoded if status error
-    if (!res.ok || (data && data.error)) {
-      const params = new URLSearchParams();
-      params.append('token', 'yls7zjbopfs9npo9');
-      params.append('to', formattedPhone);
-      params.append('body', messageBody);
-      
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
-      });
-    }
-
-    return data;
+    const text = await res.text();
+    console.log(`📲 [UltraMsg API Response -> ${formattedPhone}]:`, text);
+    try { return JSON.parse(text); } catch(e) { return text; }
   } catch (err) {
-    console.error(`❌ [UltraMsg API Error -> ${toPhone}]:`, err);
+    console.error(`❌ [UltraMsg API Error -> ${toPhone}]:`, err.message);
   }
 };
 
@@ -280,7 +264,7 @@ const sendAutomatedCustomerWhatsappMessage = async (orderData) => {
     const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
 
     // Automated Message to Owner Numbers (919828023641 & 919549348495)
-    const ownerMsg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal Amount: ₹${orderData.totalAmount}\n\nItems:\n${itemsText}`;
+    const ownerMsg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail || 'N/A'}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal Amount: ₹${orderData.totalAmount}\n\nItems:\n${itemsText}`;
 
     // Dispatch concurrently to Customer and Both Owner Numbers
     await Promise.allSettled([
@@ -298,7 +282,7 @@ router.post('/orders', async (req, res) => {
     const { customerName, customerPhone, shippingAddress } = req.body;
     
     if (!customerName || !customerPhone || !shippingAddress) {
-      return res.status(400).json({ success: false, message: 'Customer name, phone, and shipping address are required.' });
+      return res.status(400).json({ success: false, message: 'Full Name, Phone Number, and Shipping Address are required.' });
     }
 
     const orderNumber = 'BVL-' + Math.floor(100000 + Math.random() * 900000);
@@ -309,10 +293,13 @@ router.post('/orders', async (req, res) => {
       paymentStatus: 'Owner Call Scheduled' 
     });
 
-    // Trigger automated silent WhatsApp notification from owner's number (+91 98280 23641) to customer
-    sendAutomatedCustomerWhatsappMessage(newOrder);
-
+    // Send HTTP 201 Created response to client FIRST
     res.status(201).json({ success: true, data: newOrder });
+
+    // Asynchronously trigger automated WhatsApp messaging in background
+    setImmediate(() => {
+      sendAutomatedCustomerWhatsappMessage(newOrder).catch(err => console.warn("WhatsApp background error:", err));
+    });
   } catch (err) {
     console.error("Order creation error:", err);
     res.status(400).json({ success: false, message: err.message });

@@ -88,13 +88,11 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
       if (data.success && data.data) {
         setCompletedOrder(data.data);
       } else {
-        const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
-        setCompletedOrder(fallbackOrder);
+        setOrderError(data.message || 'Error reserving order on studio server.');
       }
     } catch (err) {
       setIsSubmitting(false);
-      const fallbackOrder = { ...orderPayload, orderNumber: 'BVL-' + Math.floor(100000 + Math.random() * 900000) };
-      setCompletedOrder(fallbackOrder);
+      setOrderError('Connection Error: Unable to connect to studio server.');
     }
   };
 
