@@ -21,11 +21,11 @@ const orderSchema = new mongoose.Schema({
   shippingFee: { type: Number, default: 0 },
   totalAmount: { type: Number, required: true },
   couponApplied: { type: String },
-  paymentMethod: { type: String, enum: ['Razorpay', 'UPI', 'Bank Transfer', 'COD'], default: 'Razorpay' },
-  paymentStatus: { type: String, enum: ['Paid', 'Pending', 'Failed', 'Refunded'], default: 'Paid' },
+  transactionRef: { type: String },
+  paymentMethod: { type: String, default: 'UPI' },
+  paymentStatus: { type: String, default: 'Verification Pending (UTR Submitted)' },
   orderStatus: { 
     type: String, 
-    enum: ['Pending', 'Accepted', 'Designing', 'Crafting', 'Packing', 'Ready to Dispatch', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Crafting'
   },
   trackingNumber: { type: String },

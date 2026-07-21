@@ -259,14 +259,16 @@ router.post('/orders', async (req, res) => {
   try {
     const { transactionRef, customerName, customerPhone, totalAmount } = req.body;
     
-    // 1. STRICT UTR REFERENCE FORMAT VALIDATION
+    // 1. STRICT UTR REFERENCE FORMAT & ANTI-FAKE VALIDATION
     const cleanUtr = (transactionRef || '').trim().replace(/\s+/g, '');
-    const isValidUtr = /^[0-9]{12}$/.test(cleanUtr) || /^[A-Za-z0-9]{12,16}$/.test(cleanUtr);
+    const isValidFormat = /^[0-9]{12}$/.test(cleanUtr) || /^[A-Za-z0-9]{12,16}$/.test(cleanUtr);
+    const uniqueDigits = new Set(cleanUtr.split('')).size;
+    const isFakePattern = uniqueDigits < 4 || ['000000000000','111111111111','222222222222','333333333333','444444444444','555555555555','666666666666','777777777777','888888888888','999999999999','123456789012','987654321098'].includes(cleanUtr);
     
-    if (!cleanUtr || !isValidUtr) {
+    if (!cleanUtr || !isValidFormat || isFakePattern) {
       return res.status(400).json({ 
         success: false, 
-        message: "❌ Payment Validation Error: Invalid UTR Transaction ID. Please enter a valid 12-digit numeric UPI UTR / RRN (e.g. 420918293019) from your Paytm, PhonePe, or Google Pay receipt." 
+        message: "❌ Payment Validation Error: Repeating or fake UTR numbers (e.g. 555555555567) are automatically rejected. Please scan Vartika Gupta's Paytm QR Code and enter your real 12-digit UTR from your bank receipt." 
       });
     }
 

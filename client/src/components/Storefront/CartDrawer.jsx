@@ -16,7 +16,7 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     customerPhone: '',
     shippingAddress: '',
     city: 'Jaipur',
-    paymentMethod: 'Paytm UPI QR Code (Vartika Gupta)',
+    paymentMethod: 'UPI',
     transactionRef: ''
   });
   const [completedOrder, setCompletedOrder] = useState(null);
@@ -30,6 +30,15 @@ export default function CartDrawer({ cartItems, isOpen, onClose, onUpdateQty, on
     navigator.clipboard.writeText('9828023641@pthdfc');
     setCopiedUpi(true);
     setTimeout(() => setCopiedUpi(false), 2500);
+  };
+
+  const isFakeUtrPattern = (utr) => {
+    const clean = (utr || '').trim().replace(/\s+/g, '');
+    if (!/^[0-9]{12}$/.test(clean) && !/^[A-Za-z0-9]{12,16}$/.test(clean)) return true;
+    const uniqueDigits = new Set(clean.split('')).size;
+    if (uniqueDigits < 4) return true; // Block fake repeating numbers like 555555555567
+    const fakes = ['000000000000','111111111111','222222222222','333333333333','444444444444','555555555555','666666666666','777777777777','888888888888','999999999999','123456789012','987654321098'];
+    return fakes.includes(clean);
   };
 
   const handleApplyCoupon = async () => {
