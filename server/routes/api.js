@@ -231,7 +231,10 @@ router.get('/orders', async (req, res) => {
 const sendUltraMsgWhatsapp = async (toPhone, messageBody) => {
   try {
     const cleanPhone = (toPhone || '').replace(/[^0-9]/g, '');
-    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : `+${cleanPhone}`;
+    if (!cleanPhone || cleanPhone.length < 10) return;
+    
+    // UltraMsg requires digits only with country code (e.g. 919828023641), no plus sign
+    const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
     const params = new URLSearchParams();
     params.append('token', 'yls7zjbopfs9npo9');
@@ -260,13 +263,15 @@ const sendAutomatedCustomerWhatsappMessage = async (orderData) => {
     // Automated Message to Customer
     const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
 
-    // Automated Message to Owner Numbers (+91 98280 23641 & +91 95493 48495)
+    // Automated Message to Owner Numbers (919828023641 & 919549348495)
     const ownerMsg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal Amount: ₹${orderData.totalAmount}\n\nItems:\n${itemsText}`;
 
-    // Dispatch automatically via UltraMsg API instance130248
-    await sendUltraMsgWhatsapp(orderData.customerPhone, customerMsg);
-    await sendUltraMsgWhatsapp('+919828023641', ownerMsg);
-    await sendUltraMsgWhatsapp('+919549348495', ownerMsg);
+    // Dispatch concurrently to Customer and Both Owner Numbers
+    await Promise.allSettled([
+      sendUltraMsgWhatsapp(orderData.customerPhone, customerMsg),
+      sendUltraMsgWhatsapp('919828023641', ownerMsg),
+      sendUltraMsgWhatsapp('919549348495', ownerMsg)
+    ]);
   } catch (err) {
     console.warn("Automated WhatsApp Dispatcher Error:", err);
   }
