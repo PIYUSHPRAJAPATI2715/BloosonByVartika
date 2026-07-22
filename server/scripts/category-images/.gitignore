@@ -1,0 +1,7 @@
+# Ignore actual image files in this folder (they go to Cloudinary, not GitHub)
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.bmp
