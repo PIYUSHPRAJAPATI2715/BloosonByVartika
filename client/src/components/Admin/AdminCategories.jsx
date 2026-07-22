@@ -33,16 +33,31 @@ export default function AdminCategories() {
     }
   };
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   // Fetch all categories for admin (including invisible ones)
   const fetchCategories = () => {
+    setLoading(true);
+    setError(null);
     fetch(getApiUrl('/api/categories?admin=true'))
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Server returned status " + res.status);
+        return res.json();
+      })
       .then(data => {
         if (data.success && data.data) {
           setCategories(data.data);
+        } else {
+          setError(data.message || "Failed to load categories");
         }
+        setLoading(false);
       })
-      .catch(err => console.warn("Categories fetch fallback:", err));
+      .catch(err => {
+        console.warn("Categories fetch fallback:", err);
+        setError("The server is currently starting up (this can take up to 60 seconds). Please check back in a moment.");
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -152,123 +167,159 @@ export default function AdminCategories() {
         </button>
       </div>
 
-      {/* Categories Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
-        {categories.map((cat) => (
-          <div 
-            key={cat._id} 
+      {/* Loading & Error States */}
+      {loading && (
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#282828', borderRadius: '20px', border: '1px dashed rgba(200, 164, 93, 0.3)', marginBottom: '24px' }}>
+          <div style={{ color: '#C8A45D', fontSize: '1.1rem', marginBottom: '8px', fontWeight: 600 }}>Loading Categories...</div>
+          <p style={{ color: '#888', fontSize: '0.82rem', margin: 0 }}>Connecting to database. Please wait a moment...</p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div style={{ padding: '40px 20px', textAlign: 'center', background: 'rgba(229, 115, 115, 0.05)', borderRadius: '20px', border: '1px dashed rgba(229, 115, 115, 0.3)', marginBottom: '24px' }}>
+          <div style={{ color: '#E57373', fontSize: '0.95rem', marginBottom: '12px', fontWeight: 600 }}>{error}</div>
+          <button 
+            onClick={fetchCategories} 
             style={{ 
-              background: '#282828', 
-              borderRadius: '20px', 
-              overflow: 'hidden',
-              border: '1px solid rgba(200, 164, 93, 0.3)', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              justifyContent: 'space-between',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+              background: '#C8A45D', 
+              color: '#1E1E1E', 
+              border: 'none', 
+              borderRadius: '8px', 
+              padding: '8px 16px', 
+              fontSize: '0.8rem', 
+              fontWeight: 600, 
+              cursor: 'pointer' 
             }}
           >
-            {/* Category Banner Cover */}
-            <div style={{ position: 'relative', height: '140px', background: '#333' }}>
-              {cat.banner ? (
-                <img 
-                  src={cat.banner} 
-                  alt={cat.name} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#666', gap: '8px' }}>
-                  <Image size={32} />
-                  <span style={{ fontSize: '0.75rem' }}>No Banner Uploaded</span>
-                </div>
-              )}
-              {/* Badge Visibility */}
-              <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-                <button 
-                  onClick={() => toggleVisibility(cat)} 
-                  style={{ 
-                    background: 'rgba(0,0,0,0.6)', 
-                    border: 'none', 
-                    borderRadius: '50%', 
-                    width: '34px', 
-                    height: '34px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    color: cat.isVisible ? '#4CAF50' : '#E57373', 
-                    cursor: 'pointer' 
-                  }}
-                  title={cat.isVisible ? 'Visible on Storefront' : 'Hidden from Storefront'}
-                >
-                  {cat.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-                </button>
-              </div>
-            </div>
+            Retry Loading
+          </button>
+        </div>
+      )}
 
-            {/* Category Details */}
-            <div style={{ padding: '20px', flexGrow: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', color: '#FFF', margin: 0 }}>
-                  {cat.name}
-                </h3>
-                <span style={{ fontSize: '0.72rem', background: '#3A3A3A', color: '#C8A45D', padding: '3px 8px', borderRadius: '8px', fontWeight: 600 }}>
-                  Order: {cat.sortOrder || 0}
-                </span>
-              </div>
-              
-              <p style={{ fontSize: '0.82rem', color: '#AAA', lineHeight: '1.5', minHeight: '36px', margin: '0 0 16px' }}>
-                {cat.description || 'No description provided.'}
-              </p>
+      {!loading && !error && categories.length === 0 && (
+        <div style={{ padding: '60px 20px', textAlign: 'center', background: '#282828', borderRadius: '20px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+          <p style={{ color: '#888', fontSize: '0.88rem', margin: 0 }}>No categories found. Click "Add New Category" above to create one.</p>
+        </div>
+      )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
-                <span style={{ fontSize: '0.72rem', color: '#888' }}>
-                  Slug: <span style={{ color: '#C8A45D' }}>/{cat.slug}</span>
-                </span>
-
-                <div style={{ display: 'flex', gap: '8px' }}>
+      {!loading && !error && categories.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
+          {categories.map((cat) => (
+            <div 
+              key={cat._id} 
+              style={{ 
+                background: '#282828', 
+                borderRadius: '20px', 
+                overflow: 'hidden',
+                border: '1px solid rgba(200, 164, 93, 0.3)', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'space-between',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+              }}
+            >
+              {/* Category Banner Cover */}
+              <div style={{ position: 'relative', height: '140px', background: '#333' }}>
+                {cat.banner ? (
+                  <img 
+                    src={cat.banner} 
+                    alt={cat.name} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#666', gap: '8px' }}>
+                    <Image size={32} />
+                    <span style={{ fontSize: '0.75rem' }}>No Banner Uploaded</span>
+                  </div>
+                )}
+                {/* Badge Visibility */}
+                <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
                   <button 
-                    onClick={() => { setEditingCategory(cat); setShowEditModal(true); }}
+                    onClick={() => toggleVisibility(cat)} 
                     style={{ 
-                      background: 'rgba(200, 164, 93, 0.1)', 
-                      border: '1px solid rgba(200, 164, 93, 0.3)', 
-                      borderRadius: '8px', 
-                      color: '#C8A45D', 
-                      padding: '6px 10px', 
-                      fontSize: '0.75rem', 
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontWeight: 600
+                      background: 'rgba(0,0,0,0.6)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: '34px', 
+                      height: '34px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      color: cat.isVisible ? '#4CAF50' : '#E57373', 
+                      cursor: 'pointer' 
                     }}
+                    title={cat.isVisible ? 'Visible on Storefront' : 'Hidden from Storefront'}
                   >
-                    <Edit size={14} /> Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(cat._id)}
-                    style={{ 
-                      background: 'rgba(229, 115, 115, 0.1)', 
-                      border: '1px solid rgba(229, 115, 115, 0.3)', 
-                      borderRadius: '8px', 
-                      color: '#E57373', 
-                      padding: '6px 10px', 
-                      fontSize: '0.75rem', 
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontWeight: 600
-                    }}
-                  >
-                    <Trash2 size={14} /> Delete
+                    {cat.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
               </div>
-            </div>
 
-          </div>
-        ))}
-      </div>
+              {/* Category Details */}
+              <div style={{ padding: '20px', flexGrow: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', color: '#FFF', margin: 0 }}>
+                    {cat.name}
+                  </h3>
+                  <span style={{ fontSize: '0.72rem', background: '#3A3A3A', color: '#C8A45D', padding: '3px 8px', borderRadius: '8px', fontWeight: 600 }}>
+                    Order: {cat.sortOrder || 0}
+                  </span>
+                </div>
+                
+                <p style={{ fontSize: '0.82rem', color: '#AAA', lineHeight: '1.5', minHeight: '36px', margin: '0 0 16px' }}>
+                  {cat.description || 'No description provided.'}
+                </p>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#888' }}>
+                    Slug: <span style={{ color: '#C8A45D' }}>/{cat.slug}</span>
+                  </span>
+
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => { setEditingCategory(cat); setShowEditModal(true); }}
+                      style={{ 
+                        background: 'rgba(200, 164, 93, 0.1)', 
+                        border: '1px solid rgba(200, 164, 93, 0.3)', 
+                        borderRadius: '8px', 
+                        color: '#C8A45D', 
+                        padding: '6px 10px', 
+                        fontSize: '0.75rem', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontWeight: 600
+                      }}
+                    >
+                      <Edit size={14} /> Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(cat._id)}
+                      style={{ 
+                        background: 'rgba(229, 115, 115, 0.1)', 
+                        border: '1px solid rgba(229, 115, 115, 0.3)', 
+                        borderRadius: '8px', 
+                        color: '#E57373', 
+                        padding: '6px 10px', 
+                        fontSize: '0.75rem', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontWeight: 600
+                      }}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* --- ADD CATEGORY MODAL --- */}
       {showAddModal && (
