@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sliders, Save, CheckCircle2, Globe, Phone, MapPin, Sparkles, Gift, Image } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
+import { uploadImage } from '../../config/upload';
 
 export default function AdminSettings({ onSettingsUpdated }) {
   const [settings, setSettings] = useState({
@@ -30,15 +31,15 @@ export default function AdminSettings({ onSettingsUpdated }) {
   });
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const handleImageUpload = (e) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSettings(prev => ({ ...prev, aboutImage: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    setUploading(true);
+    const { url } = await uploadImage(file);
+    setSettings(prev => ({ ...prev, aboutImage: url }));
+    setUploading(false);
   };
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layers, Plus, Eye, EyeOff, Edit, Trash2, Save, X, Image } from 'lucide-react';
 import Pagination from '../Common/Pagination';
 import { getApiUrl } from '../../config/api';
+import { uploadImage } from '../../config/upload';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
@@ -19,19 +20,19 @@ export default function AdminCategories() {
 
   const [editingCategory, setEditingCategory] = useState(null);
 
-  const handleBannerUpload = (e, isEdit = false) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleBannerUpload = async (e, isEdit = false) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (isEdit) {
-          setEditingCategory(prev => ({ ...prev, banner: reader.result }));
-        } else {
-          setNewCategory(prev => ({ ...prev, banner: reader.result }));
-        }
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    setUploading(true);
+    const { url } = await uploadImage(file);
+    if (isEdit) {
+      setEditingCategory(prev => ({ ...prev, banner: url }));
+    } else {
+      setNewCategory(prev => ({ ...prev, banner: url }));
     }
+    setUploading(false);
   };
 
   const [page, setPage] = useState(1);

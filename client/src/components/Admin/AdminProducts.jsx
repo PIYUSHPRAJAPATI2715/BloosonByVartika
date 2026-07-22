@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Box, Image as ImageIcon, Tag, Sparkles, CheckCircle2, RefreshCw, Link, Upload, Grid } from 'lucide-react';
+import { Package, Plus, Edit, Trash2, Save, X, Image, Tag, AlertCircle, Box, Image as ImageIcon, Sparkles, CheckCircle2, RefreshCw, Link, Upload, Grid } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
+import { uploadImage } from '../../config/upload';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([
@@ -83,15 +84,15 @@ export default function AdminProducts() {
       .catch(err => console.warn("Admin products fallback:", err));
   }, []);
 
-  const handleFileUpload = (e) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    setUploading(true);
+    const { url } = await uploadImage(file);
+    setFormData({ ...formData, imageUrl: url });
+    setUploading(false);
   };
 
   const handleOpenAdd = () => {
@@ -378,9 +379,9 @@ export default function AdminProducts() {
                       }}
                     >
                       <Upload size={28} color="#C8A45D" style={{ marginBottom: '8px' }} />
-                      <span style={{ fontSize: '0.85rem', color: '#FFF', fontWeight: 600 }}>Click to Upload Image from Computer / Phone Gallery</span>
-                      <span style={{ fontSize: '0.72rem', color: '#AAA', marginTop: '2px' }}>Supports PNG, JPG, WEBP (Instant Base64 conversion)</span>
-                      <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+                      <span style={{ fontSize: '0.85rem', color: '#FFF', fontWeight: 600 }}>{uploading ? '⏳ Uploading to cloud...' : 'Click to Upload Image'}</span>
+                      <span style={{ fontSize: '0.72rem', color: '#AAA', marginTop: '2px' }}>{uploading ? 'Please wait, image is being uploaded...' : 'Supports PNG, JPG, WEBP — stored on Cloudinary CDN'}</span>
+                      <input type="file" accept="image/*" onChange={handleFileUpload} disabled={uploading} style={{ display: 'none' }} />
                     </label>
 
                     {formData.imageUrl && (

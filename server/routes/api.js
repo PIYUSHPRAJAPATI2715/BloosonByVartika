@@ -10,9 +10,39 @@ const User = require('../models/User');
 const Setting = require('../models/Setting');
 const { Inquiry, Coupon, Banner, Review, CalendarEvent } = require('../models/AuxiliaryModels');
 
+// Cloudinary upload (only if env vars present)
+let upload = null;
+try {
+  const cloudinaryConfig = require('../config/cloudinary');
+  upload = cloudinaryConfig.upload;
+} catch(e) {
+  console.warn('Cloudinary not configured:', e.message);
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'blossom_luxury_secret_key_2026_jaipur';
 
 // --- AUTHENTICATION & USER PORTAL ---
+
+// --- IMAGE UPLOAD TO CLOUDINARY ---
+router.post('/upload', (req, res) => {
+  if (!upload) {
+    return res.status(503).json({ success: false, message: 'Image upload not configured. Add Cloudinary env vars.' });
+  }
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err);
+      return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    res.json({
+      success: true,
+      url: req.file.path,          // Cloudinary secure URL
+      public_id: req.file.filename  // Cloudinary public_id for future deletion
+    });
+  });
+});
 
 // User Registration
 router.post('/auth/register', async (req, res) => {
