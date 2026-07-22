@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gift, Heart, Sparkles, Crown, Baby, Cake, Building, Palette, ArrowRight } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function ServicesGrid({ onSelectCategory }) {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [services, setServices] = useState([]);
 
-  const services = [
+  const fallbackServices = [
     {
       id: 'rakhi',
       title: 'Rakhi',
@@ -67,6 +69,67 @@ export default function ServicesGrid({ onSelectCategory }) {
     }
   ];
 
+  useEffect(() => {
+    fetch(getApiUrl('/api/categories'))
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.length > 0) {
+          const sorted = [...data.data].sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99));
+          const mapped = sorted.map(cat => {
+            const nameLower = cat.name.toLowerCase();
+            let icon = <Gift size={28} color="#C8A45D" />;
+            let badge = 'Collection';
+
+            if (nameLower.includes('rakhi')) {
+              icon = <Crown size={28} color="#C8A45D" />;
+              badge = 'Festive Special';
+            } else if (nameLower.includes('keychain')) {
+              icon = <Palette size={28} color="#E8B7C9" />;
+              badge = 'Trending';
+            } else if (nameLower.includes('birth')) {
+              icon = <Cake size={28} color="#C8A45D" />;
+              badge = 'Popular';
+            } else if (nameLower.includes('anniv') || nameLower.includes('couple') || nameLower.includes('love')) {
+              icon = <Heart size={28} color="#E8B7C9" />;
+              badge = 'Elegant';
+            } else if (nameLower.includes('wed') || nameLower.includes('bridal') || nameLower.includes('trousseau')) {
+              icon = <Crown size={28} color="#C8A45D" />;
+              badge = 'Maharani Class';
+            } else if (nameLower.includes('corp') || nameLower.includes('office')) {
+              icon = <Building size={28} color="#E8B7C9" />;
+              badge = 'Bulk Discount';
+            } else if (nameLower.includes('baby')) {
+              icon = <Gift size={28} color="#C8A45D" />;
+              badge = 'Newborn Special';
+            }
+
+            let items = ['Handcrafted custom designs', 'Premium luxury packaging', 'Personalized greeting inserts'];
+            if (cat.description) {
+              const parts = cat.description.split(/[,.;]/).map(s => s.trim()).filter(Boolean);
+              if (parts.length >= 2) {
+                items = parts.slice(0, 3).map(p => p.charAt(0).toUpperCase() + p.slice(1));
+              }
+            }
+
+            return {
+              id: cat._id,
+              title: cat.name,
+              tagline: cat.description || 'Luxury handcrafted gifts and bespoke hampers.',
+              icon,
+              image: cat.banner || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+              categoryFilter: cat.name,
+              items,
+              badge
+            };
+          });
+          setServices(mapped);
+        }
+      })
+      .catch(err => console.warn("Services grid fetch fallback:", err));
+  }, []);
+
+  const displayServices = services.length > 0 ? services : fallbackServices;
+
   return (
     <section id="services" style={{ padding: '90px 24px', background: 'var(--cream-bg)' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -90,7 +153,7 @@ export default function ServicesGrid({ onSelectCategory }) {
             gap: '32px'
           }}
         >
-          {services.map((service) => {
+          {displayServices.map((service) => {
             const isHovered = hoveredCard === service.id;
 
             return (
