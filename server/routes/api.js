@@ -524,7 +524,21 @@ router.get('/settings', async (req, res) => {
         heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
         contactEmail: "vartika1594@gmail.com",
         contactPhone: "+91 98280 23641",
-        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021"
+        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
+        aboutTitle: "Founder Vartika Gupta",
+        aboutHeading: "Meet Founder Vartika Gupta",
+        aboutDescription: "Born in the vibrant Pink City of Jaipur, Vartika founded Blossom by Vartika with a single mission: to transform standard gifting into emotional, unforgettable works of art.",
+        aboutImage: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+        aboutBadgeText: "10,000+ Gifts Packed",
+        aboutBadgeSub: "Trusted by Brides & Planners",
+        aboutValuesTitle: "Why Blossom Gifts Are Treasured Forever",
+        aboutValuesDesc: "Unlike mass-manufactured boxes, every gift created at our Jaipur studio carries individual character. We combine royal Rajasthani heritage motifs with modern minimalist French aesthetics.",
+        aboutValue1Title: "Custom Theme Matching",
+        aboutValue1Desc: "Color-coordinated to match your wedding outfit or event decor.",
+        aboutValue2Title: "Monogram Personalization",
+        aboutValue2Desc: "Custom foil printing with initials, dates, and handwritten scrolls.",
+        aboutValue3Title: "Eco-Conscious Keepsakes",
+        aboutValue3Desc: "Reusable trunks and rigid boxes built to last a lifetime."
       });
     }
     res.json({ success: true, data: settings });
@@ -537,7 +551,21 @@ router.get('/settings', async (req, res) => {
         heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
         contactEmail: "vartika1594@gmail.com",
         contactPhone: "+91 98280 23641",
-        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021"
+        address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
+        aboutTitle: "Founder Vartika Gupta",
+        aboutHeading: "Meet Founder Vartika Gupta",
+        aboutDescription: "Born in the vibrant Pink City of Jaipur, Vartika founded Blossom by Vartika with a single mission: to transform standard gifting into emotional, unforgettable works of art.",
+        aboutImage: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+        aboutBadgeText: "10,000+ Gifts Packed",
+        aboutBadgeSub: "Trusted by Brides & Planners",
+        aboutValuesTitle: "Why Blossom Gifts Are Treasured Forever",
+        aboutValuesDesc: "Unlike mass-manufactured boxes, every gift created at our Jaipur studio carries individual character. We combine royal Rajasthani heritage motifs with modern minimalist French aesthetics.",
+        aboutValue1Title: "Custom Theme Matching",
+        aboutValue1Desc: "Color-coordinated to match your wedding outfit or event decor.",
+        aboutValue2Title: "Monogram Personalization",
+        aboutValue2Desc: "Custom foil printing with initials, dates, and handwritten scrolls.",
+        aboutValue3Title: "Eco-Conscious Keepsakes",
+        aboutValue3Desc: "Reusable trunks and rigid boxes built to last a lifetime."
       }
     });
   }

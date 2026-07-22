@@ -206,6 +206,137 @@ export default function AdminSettings({ onSettingsUpdated }) {
             />
           </div>
 
+          {/* About Us & Founder Section Customizer */}
+          <div style={{ background: '#1E1E1E', borderRadius: '16px', padding: '20px', border: '1px solid rgba(200,164,93,0.3)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', color: '#F4E8C1', fontWeight: 700, fontFamily: 'var(--font-serif)', fontSize: '1.1rem' }}>
+              <Globe size={18} color="#C8A45D" /> Founder & "About Us" Section Settings
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>About Section Title Tag</label>
+                  <input 
+                    type="text" 
+                    value={settings.aboutTitle || ''} 
+                    onChange={e => setSettings({...settings, aboutTitle: e.target.value})} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Founder Photo URL</label>
+                  <input 
+                    type="text" 
+                    value={settings.aboutImage || ''} 
+                    onChange={e => setSettings({...settings, aboutImage: e.target.value})} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Main Section Heading</label>
+                <input 
+                  type="text" 
+                  value={settings.aboutHeading || ''} 
+                  onChange={e => setSettings({...settings, aboutHeading: e.target.value})} 
+                  style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Founder Bio Description</label>
+                <textarea 
+                  rows={3}
+                  value={settings.aboutDescription || ''} 
+                  onChange={e => setSettings({...settings, aboutDescription: e.target.value})} 
+                  style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Floating Badge Headline</label>
+                  <input 
+                    type="text" 
+                    value={settings.aboutBadgeText || ''} 
+                    onChange={e => setSettings({...settings, aboutBadgeText: e.target.value})} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Floating Badge Subtitle</label>
+                  <input 
+                    type="text" 
+                    value={settings.aboutBadgeSub || ''} 
+                    onChange={e => setSettings({...settings, aboutBadgeSub: e.target.value})} 
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '14px', marginTop: '6px' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#C8A45D', display: 'block', marginBottom: '10px' }}>
+                  Core Values Section Content
+                </span>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '0.78rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Values Main Heading</label>
+                    <input 
+                      type="text" 
+                      value={settings.aboutValuesTitle || ''} 
+                      onChange={e => setSettings({...settings, aboutValuesTitle: e.target.value})} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.78rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Values Intro Subtext</label>
+                    <textarea 
+                      rows={2}
+                      value={settings.aboutValuesDesc || ''} 
+                      onChange={e => setSettings({...settings, aboutValuesDesc: e.target.value})} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 1 Title</label>
+                      <input type="text" value={settings.aboutValue1Title || ''} onChange={e => setSettings({...settings, aboutValue1Title: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 1 Description</label>
+                      <input type="text" value={settings.aboutValue1Desc || ''} onChange={e => setSettings({...settings, aboutValue1Desc: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 2 Title</label>
+                      <input type="text" value={settings.aboutValue2Title || ''} onChange={e => setSettings({...settings, aboutValue2Title: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 2 Description</label>
+                      <input type="text" value={settings.aboutValue2Desc || ''} onChange={e => setSettings({...settings, aboutValue2Desc: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 3 Title</label>
+                      <input type="text" value={settings.aboutValue3Title || ''} onChange={e => setSettings({...settings, aboutValue3Title: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#AAA' }}>Value 3 Description</label>
+                      <input type="text" value={settings.aboutValue3Desc || ''} onChange={e => setSettings({...settings, aboutValue3Desc: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.85rem' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <button type="submit" className="btn-gold" style={{ justifyContent: 'center', padding: '12px', marginTop: '10px' }}>
             <Save size={16} /> Save Live Changes
           </button>

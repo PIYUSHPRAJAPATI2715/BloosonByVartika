@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, Instagram, Facebook, Phone, Mail, MapPin } from 'lucide-react';
 
-export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz, websiteSettings }) {
+export default function Footer({ websiteSettings }) {
   const address = websiteSettings?.address || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
   const phone = websiteSettings?.contactPhone || "+91 98280 23641";
   const email = websiteSettings?.contactEmail || "vartika1594@gmail.com";
@@ -21,7 +21,7 @@ export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQ
               </span>
             </div>
             <p style={{ color: '#AAA', fontSize: '0.85rem', lineHeight: 1.6, marginBottom: '20px' }}>
-              Luxury Trousseau Packaging | Premium Gift Hampers | Handcrafted Wedding Packaging Studio in Jaipur, Rajasthan.
+              Handcrafted Premium Gifts | Customized Keychains | Creative Explosion Boxes | Vaishali Nagar Studio, Jaipur.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ background: 'rgba(255,255,255,0.1)', color: '#F4E8C1', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Instagram size={16} /></a>
@@ -33,10 +33,9 @@ export default function Footer({ onOpenCustomOrder, onOpenHamperBuilder, onOpenQ
           <div>
             <h4 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.1rem', marginBottom: '16px' }}>Quick Navigation</h4>
             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.88rem' }}>
-              <li><a href="#services" style={{ color: '#CCC', textDecoration: 'none' }}>Wedding Collections</a></li>
-              <li><a href="#collection" style={{ color: '#CCC', textDecoration: 'none' }}>Festive & Birthday Hampers</a></li>
-              <li><button onClick={onOpenHamperBuilder} style={{ background: 'none', border: 'none', color: '#C8A45D', cursor: 'pointer', padding: 0, fontSize: '0.88rem' }}>Bespoke Hamper Builder</button></li>
-              <li><button onClick={onOpenQuiz} style={{ background: 'none', border: 'none', color: '#E8B7C9', cursor: 'pointer', padding: 0, fontSize: '0.88rem' }}>AI Gift Finder Quiz</button></li>
+              <li><a href="#services" style={{ color: '#CCC', textDecoration: 'none' }}>Categories & Collections</a></li>
+              <li><a href="#collection" style={{ color: '#CCC', textDecoration: 'none' }}>Storefront Gallery</a></li>
+              <li><a href="#contact" style={{ color: '#CCC', textDecoration: 'none' }}>Contact & Inquiry</a></li>
             </ul>
           </div>
 

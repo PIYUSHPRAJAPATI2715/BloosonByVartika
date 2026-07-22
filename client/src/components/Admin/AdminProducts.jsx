@@ -45,17 +45,34 @@ export default function AdminProducts() {
 
   const generateSku = () => `BV-PROD-${Math.floor(1000 + Math.random() * 9000)}`;
 
+  const [categoriesList, setCategoriesList] = useState([
+    'Rakhi', 'Keychains', 'Birthday', 'Anniversary', 'Wedding', 'Corporate', 'Baby Shower', 'Explosion Boxes', 'Festive'
+  ]);
+
   const [formData, setFormData] = useState({
     _id: '',
     name: '',
     sku: generateSku(),
-    category: 'Wedding Collection',
+    category: 'Rakhi',
     price: '',
     discountPrice: '',
     stock: 10,
     imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-    description: 'Handcrafted luxury hamper with bespoke embellishments.'
+    description: 'Handcrafted luxury product.'
   });
+
+  useEffect(() => {
+    fetch(getApiUrl('/api/categories'))
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.length > 0) {
+          const list = data.data.map(c => c.name);
+          setCategoriesList(list);
+          setFormData(prev => ({ ...prev, category: list[0] }));
+        }
+      })
+      .catch(err => console.warn("Admin categories fetch fallback:", err));
+  }, []);
 
   useEffect(() => {
     fetch(getApiUrl('/api/products'))
@@ -272,12 +289,9 @@ export default function AdminProducts() {
                 <div>
                   <label style={{ fontSize: '0.82rem', color: '#C8A45D', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Category</label>
                   <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }}>
-                    <option value="Wedding Collection">Wedding Collection</option>
-                    <option value="Birthday Collection">Birthday Collection</option>
-                    <option value="Baby Collection">Baby Collection</option>
-                    <option value="Festival Collection">Festival Collection</option>
-                    <option value="Corporate Gifting">Corporate Gifting</option>
-                    <option value="Handmade Products">Handmade Products</option>
+                    {categoriesList.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
               </div>

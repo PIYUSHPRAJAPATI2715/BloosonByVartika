@@ -87,25 +87,20 @@ export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder,
               lineHeight: 1.7
             }}
           >
-            Handcrafted luxury hampers, bespoke bridal trousseau packing, and personalized wedding keepsakes. Designed with elegance in Jaipur to create unforgettable memories.
+            Handcrafted premium gifts, customized resin keychains, wedding items, and personalized birthday greeting packs. Designed with elegance in Jaipur to create unforgettable memories.
           </p>
 
           {/* CTA Buttons */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
             <a href="#collection" className="btn-gold">
-              <span>Explore Collection</span>
+              <span>Explore Collections</span>
               <ChevronRight size={18} />
             </a>
 
-            <button onClick={onOpenCustomOrder} className="btn-blush">
-              <Gift size={18} />
-              <span>Book Custom Order</span>
-            </button>
-
-            <button onClick={onOpenHamperBuilder} className="btn-outline-gold">
-              <Sparkles size={16} color="#C8A45D" />
-              <span>Build Hamper</span>
-            </button>
+            <a href="#contact" className="btn-outline-gold" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>Contact Vartika</span>
+              <ArrowUpRight size={16} />
+            </a>
           </div>
 
           {/* Quick Badges */}

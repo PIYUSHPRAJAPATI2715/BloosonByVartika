@@ -5,15 +5,26 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
 
-  const categories = [
-    'All',
-    'Wedding Collection',
-    'Birthday Collection',
-    'Baby Collection',
-    'Festival Collection',
-    'Corporate Gifting',
-    'Handmade Products'
-  ];
+  const [categories, setCategories] = useState(['All']);
+
+  useEffect(() => {
+    const fetchUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000/api/categories'
+      : 'https://bloosombyvartika.onrender.com/api/categories';
+    fetch(fetchUrl)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.length > 0) {
+          setCategories(['All', ...data.data.map(c => c.name)]);
+        }
+      })
+      .catch(err => {
+        // Fallback categories
+        setCategories([
+          'All', 'Rakhi', 'Keychains', 'Birthday', 'Anniversary', 'Wedding', 'Corporate', 'Baby Shower', 'Explosion Boxes', 'Festive'
+        ]);
+      });
+  }, []);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
@@ -38,10 +49,10 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
         <div style={{ textAlign: 'center', maxWidth: '750px', margin: '0 auto 40px' }}>
           <span className="ribbon-tag" style={{ marginBottom: '12px' }}>Curated Boutique</span>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.6rem', color: '#2E2E2E', marginBottom: '16px' }}>
-            The Luxury <span className="title-blush-gradient">Gallery & Hampers</span>
+            The Premium <span className="title-blush-gradient">Storefront Gallery</span>
           </h2>
           <p style={{ color: '#4A4A4A', fontSize: '1.02rem' }}>
-            Filter by occasion or build your own bespoke gift box with personalized monogramming.
+            Filter by category to explore our premium handcrafted products. Add to bag to place a quick order.
           </p>
         </div>
 
@@ -86,12 +97,12 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
             ))}
           </div>
 
-          {/* Search Bar & Custom Builder CTA */}
-          <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '600px', flexWrap: 'wrap' }}>
+          {/* Search Bar */}
+          <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '600px', justifyContent: 'center' }}>
             <div style={{ flex: 1, position: 'relative', minWidth: '240px' }}>
               <input 
                 type="text"
-                placeholder="Search bridal trousseau, shagun trays, dry fruit trunks..."
+                placeholder="Search rakhis, keychains, cards, explosion boxes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
@@ -106,15 +117,6 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
               />
               <Search size={18} color="#C8A45D" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
             </div>
-
-            <button
-              onClick={onOpenHamperBuilder}
-              className="btn-gold"
-              style={{ padding: '10px 20px', fontSize: '0.85rem' }}
-            >
-              <Sparkles size={16} />
-              <span>Build Custom Box</span>
-            </button>
           </div>
         </div>
 

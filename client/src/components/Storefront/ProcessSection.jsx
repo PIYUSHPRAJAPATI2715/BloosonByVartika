@@ -1,15 +1,16 @@
 import React from 'react';
-import { Palette, MessageSquare, Eye, Scissors, ShieldCheck, Box, Truck } from 'lucide-react';
+import { Palette, MessageSquare, Scissors, Box, Truck } from 'lucide-react';
 
-export default function ProcessSection() {
+export default function ProcessSection({ websiteSettings }) {
+  const heading = websiteSettings?.processHeading || "The Handcrafting Process";
+  const subheading = websiteSettings?.processSubheading || "Every product is meticulously crafted to perfection.";
+
   const steps = [
-    { title: '1. Choose Theme', desc: 'Select occasion, colors & budget', icon: <Palette size={22} color="#C8A45D" /> },
-    { title: '2. Share Details', desc: 'Custom initials, messages & dates', icon: <MessageSquare size={22} color="#E8B7C9" /> },
-    { title: '3. Design Preview', desc: 'Digital layout & material sample', icon: <Eye size={22} color="#C8A45D" /> },
-    { title: '4. Handcrafting', desc: 'Artisanal assembly in Jaipur', icon: <Scissors size={22} color="#E8B7C9" /> },
-    { title: '5. Quality Check', desc: 'Rigorous finishing & velvet inspect', icon: <ShieldCheck size={22} color="#C8A45D" /> },
-    { title: '6. Luxury Packing', desc: 'Satin ribbons & rose essence', icon: <Box size={22} color="#E8B7C9" /> },
-    { title: '7. Doorstep Delivery', desc: 'Express shipping nationwide', icon: <Truck size={22} color="#C8A45D" /> }
+    { title: '1. Select Category', desc: 'Browse Rakhi, Keychains, etc.', icon: <Palette size={22} color="#C8A45D" /> },
+    { title: '2. Add Custom Details', desc: 'Share initials or custom text details', icon: <MessageSquare size={22} color="#E8B7C9" /> },
+    { title: '3. Handcrafting', desc: 'Meticulous resin or card craft', icon: <Scissors size={22} color="#E8B7C9" /> },
+    { title: '4. Safe Packing', desc: 'Fragrant luxury signature boxes', icon: <Box size={22} color="#E8B7C9" /> },
+    { title: '5. Fast Delivery', desc: 'Express shipping across India', icon: <Truck size={22} color="#C8A45D" /> }
   ];
 
   return (
@@ -17,11 +18,14 @@ export default function ProcessSection() {
       <div style={{ maxWidth: '1280px', margin: '0 auto', textAlign: 'center' }}>
         
         <span className="ribbon-tag" style={{ marginBottom: '12px' }}>How We Work</span>
-        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: '#2E2E2E', marginBottom: '48px' }}>
-          The 7-Step <span className="title-gold-gradient">Handcrafting Process</span>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: '#2E2E2E', marginBottom: '16px' }}>
+          {heading}
         </h2>
+        <p style={{ color: '#666', fontSize: '0.95rem', marginBottom: '48px' }}>
+          {subheading}
+        </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
           {steps.map((step, index) => (
             <div 
               key={index}

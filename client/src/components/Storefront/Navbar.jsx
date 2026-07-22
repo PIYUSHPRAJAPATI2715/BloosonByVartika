@@ -149,19 +149,13 @@ export default function Navbar({
               boxShadow: '0 4px 15px rgba(0,0,0,0.02)'
             }}
           >
-            <a href="#services" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 600, fontSize: '0.85rem' }}>Collections</a>
+            <a href="#services" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 600, fontSize: '0.85rem' }}>Categories</a>
             <a href="#collection" style={{ textDecoration: 'none', color: '#2E2E2E', fontWeight: 600, fontSize: '0.85rem' }}>Storefront</a>
             {onOpenAllProducts && (
               <button onClick={onOpenAllProducts} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C8A45D', fontWeight: 700, fontSize: '0.85rem' }}>
                 All Products
               </button>
             )}
-            <button onClick={onOpenPlanner} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A7734', fontWeight: 600, fontSize: '0.85rem' }}>
-              💍 Trousseau Planner
-            </button>
-            <button onClick={onOpenHamperBuilder} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C98BA2', fontWeight: 600, fontSize: '0.85rem' }}>
-              🎁 Custom Builder
-            </button>
           </nav>
 
           {/* Right Actions: Bag & Mobile Menu Controls */}
@@ -328,7 +322,7 @@ export default function Navbar({
               onClick={() => setMobileMenuOpen(false)}
               style={{ color: '#F4E8C1', textDecoration: 'none', fontSize: '1.15rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px' }}
             >
-              🌸 Collections & Services
+              🌸 Categories & Collections
             </a>
 
             <a 
@@ -336,7 +330,7 @@ export default function Navbar({
               onClick={() => setMobileMenuOpen(false)}
               style={{ color: '#FFF', textDecoration: 'none', fontSize: '1.15rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px' }}
             >
-              ✨ Storefront Hampers
+              ✨ Storefront Products
             </a>
 
             {onOpenAllProducts && (
@@ -344,30 +338,9 @@ export default function Navbar({
                 onClick={() => { setMobileMenuOpen(false); onOpenAllProducts(); }}
                 style={{ background: 'none', border: 'none', color: '#C8A45D', fontSize: '1.15rem', fontWeight: 700, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
               >
-                <Search size={20} /> View All 18+ Products
+                <Search size={20} /> View All Products
               </button>
             )}
-
-            <button 
-              onClick={() => { setMobileMenuOpen(false); onOpenPlanner(); }}
-              style={{ background: 'none', border: 'none', color: '#FFF', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
-            >
-              💍 Bridal Trousseau Planner
-            </button>
-
-            <button 
-              onClick={() => { setMobileMenuOpen(false); onOpenHamperBuilder(); }}
-              style={{ background: 'none', border: 'none', color: '#E8B7C9', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
-            >
-              🎁 Bespoke Hamper Builder
-            </button>
-
-            <button 
-              onClick={() => { setMobileMenuOpen(false); onOpenQuiz(); }}
-              style={{ background: 'none', border: 'none', color: '#F4E8C1', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
-            >
-              <Sparkles size={20} color="#C8A45D" /> AI Gift Finder Quiz
-            </button>
 
             <button 
               onClick={() => { setMobileMenuOpen(false); onOpenOrderTracker(); }}

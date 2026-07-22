@@ -19,168 +19,118 @@ const CustomOrder = require('../models/CustomOrder');
 const { Inquiry, Coupon, Banner, Review, CalendarEvent } = require('../models/AuxiliaryModels');
 
 const sampleCategories = [
-  { name: 'Wedding Collection', slug: 'wedding-collection', description: 'Bridal Trousseau Packing, Shagun Trays & Royal Wedding Box Sets', sortOrder: 1, isFeatured: true },
-  { name: 'Birthday Collection', slug: 'birthday-collection', description: 'Handcrafted Birthday Hampers, Keepsakes & Money Gift Boxes', sortOrder: 2, isFeatured: true },
-  { name: 'Baby Collection', slug: 'baby-collection', description: 'Newborn Announcement Boxes, Naming Ceremony & Baby Shower Chests', sortOrder: 3, isFeatured: true },
-  { name: 'Festival Collection', slug: 'festival-collection', description: 'Diwali Gold Foil Chests, Rakhi Hampers & Royal Karwa Chauth Trays', sortOrder: 4, isFeatured: true },
-  { name: 'Corporate Gifting', slug: 'corporate-gifting', description: 'Customized Executive Hampers, Luxury Branding & Client Keepsakes', sortOrder: 5, isFeatured: true },
-  { name: 'Handmade Products', slug: 'handmade-products', description: 'Customized Explosion Boxes, Velvet Greeting Cards & Memory Albums', sortOrder: 6, isFeatured: true }
+  { name: 'Rakhi', slug: 'rakhi', description: 'Designer Rakhis, hampers, and custom greeting packs', sortOrder: 1, isFeatured: true },
+  { name: 'Keychains', slug: 'keychains', description: 'Handcrafted customized name keychains & resin hooks', sortOrder: 2, isFeatured: true },
+  { name: 'Birthday', slug: 'birthday', description: 'Exquisite personalized cards, surprise packs, and gift items', sortOrder: 3, isFeatured: true },
+  { name: 'Anniversary', slug: 'anniversary', description: 'Memorable couple items, keepsakes, and customized frames', sortOrder: 4, isFeatured: true },
+  { name: 'Wedding', slug: 'wedding', description: 'Custom bridal packing, ring boxes, and shagun trays', sortOrder: 5, isFeatured: true },
+  { name: 'Corporate', slug: 'corporate', description: 'Premium corporate gifts, planners, and branding kits', sortOrder: 6, isFeatured: true },
+  { name: 'Baby Shower', slug: 'baby-shower', description: 'Newborn congratulations packs & theme hampers', sortOrder: 7, isFeatured: true },
+  { name: 'Explosion Boxes', slug: 'explosion-boxes', description: 'Interactive multi-layer photo explosion boxes', sortOrder: 8, isFeatured: true },
+  { name: 'Festive', slug: 'festive', description: 'Diwali chests, Karwa Chauth hampers, and seasonal delights', sortOrder: 9, isFeatured: true }
 ];
 
 const sampleProducts = [
   {
-    name: "Royal Pink Jaipur Bridal Trousseau Box Set",
-    sku: "BV-TROUSSEAU-01",
-    category: "Wedding Collection",
-    subCategory: "Bridal Trousseau",
-    price: 18500,
-    discountPrice: 16500,
+    name: "Royal Zari Designer Rakhi Set",
+    sku: "BV-RAKHI-01",
+    category: "Rakhi",
+    subCategory: "Premium Rakhis",
+    price: 990,
+    discountPrice: 750,
     rating: 5.0,
     reviewCount: 42,
     images: [
-      "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&q=80&w=800"
     ],
-    description: "Handcrafted 5-piece royal bridal trouseau packaging set crafted with plush blush pink velvet, zari border work, customized brass lock buckles, and dried botanicals.",
-    materialUsed: "Blush Velvet, Antique Brass Accents, Zari Ribbons, Rose Petals",
-    dimensions: "24 x 18 x 10 inches",
-    weight: "4.2 kg",
-    availableColors: ["Blush Pink", "Royal Ivory", "Emerald Gold"],
-    tags: ["Handmade", "Bridal", "Luxury", "Trousseau"],
-    stock: 8,
+    description: "Premium handcrafted Rakhi with beautiful Jaipur gold zari threading, embellishments, and custom Roli Chawal platter packaging.",
+    materialUsed: "Jaipur Zari thread, beads, custom card",
+    dimensions: "6 x 4 inches",
+    weight: "0.1 kg",
+    availableColors: ["Royal Crimson", "Emerald Gold"],
+    tags: ["Rakhi", "Festival", "Handmade"],
+    stock: 50,
     isFeatured: true,
     isTrending: true,
     isBestSeller: true,
     variants: [
-      { name: "3-Piece Standard", price: 12500, stock: 5 },
-      { name: "5-Piece Royal Edition", price: 18500, discountPrice: 16500, stock: 8 },
-      { name: "7-Piece Grand Maharani", price: 28000, stock: 3 }
+      { name: "Single Premium Rakhi", price: 750, stock: 50 }
     ],
-    seoTitle: "Luxury Royal Pink Bridal Trousseau Box Set | Jaipur Handcrafted",
-    seoDescription: "Custom handcrafted luxury bridal trouseau packaging with blush pink velvet and zari finish by Vartika Gupta."
+    seoTitle: "Designer Handcrafted Zari Rakhi | Blossom by Vartika",
+    seoDescription: "Exquisite handmade zari designer Rakhi set crafted by Vartika Gupta."
   },
   {
-    name: "Peacock Mirror Shagun Tray & Ring Ceremony Hamper",
-    sku: "BV-WED-02",
-    category: "Wedding Collection",
-    subCategory: "Shagun Trays",
-    price: 6800,
-    discountPrice: 5950,
+    name: "Personalized Resin Name Keychain",
+    sku: "BV-KEY-01",
+    category: "Keychains",
+    subCategory: "Resin Art",
+    price: 490,
+    discountPrice: 350,
     rating: 4.9,
     reviewCount: 31,
     images: [
-      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800"
     ],
-    description: "Intricately carved mirror shagun tray lined with gold lace and pearl tassels, specifically curated for engagement rings and auspicious shagun gifts.",
-    materialUsed: "Mirror Glass, Gold Brocade, Pearl Strands, Fresh Floral Accents",
-    dimensions: "16 x 12 x 4 inches",
-    weight: "1.8 kg",
-    availableColors: ["Gold & Emerald", "Blush Pink & Gold"],
-    tags: ["Shagun Tray", "Ring Ceremony", "Handmade"],
-    stock: 12,
+    description: "Elegant customized keychain embedded with gold leaf flakes, dried botanicals, and customized cursive brass monogram name.",
+    materialUsed: "Resin, Gold Leaf flakes, Brass Monograms",
+    dimensions: "2.5 x 1 inches",
+    weight: "0.05 kg",
+    availableColors: ["Clear Gold", "Rose Petal Blush", "Ocean Teal"],
+    tags: ["Keychain", "Resin", "Personalized"],
+    stock: 100,
     isFeatured: true,
     isBestSeller: true,
     variants: [
-      { name: "Standard Tray", price: 5950, stock: 12 }
+      { name: "Standard Resin Name", price: 350, stock: 100 }
     ]
   },
   {
-    name: "Golden Royale Diwali & Festive Gift Trunk",
-    sku: "BV-FEST-01",
-    category: "Festival Collection",
-    subCategory: "Diwali Hampers",
-    price: 8500,
-    discountPrice: 7600,
+    name: "Classic Happy Birthday Explosion Box",
+    sku: "BV-EX-01",
+    category: "Explosion Boxes",
+    subCategory: "Birthdays",
+    price: 3400,
+    discountPrice: 2990,
     rating: 5.0,
     reviewCount: 19,
     images: [
-      "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800"
     ],
-    description: "Gold embossed leatherette trunk featuring premium artisanal dry fruits, brass lotus diyas, scented soy candles, and personalized festive message card.",
-    materialUsed: "Gold Embossed Leatherette, Solid Brass Diyas, Organic Soy Wax",
-    dimensions: "14 x 10 x 6 inches",
-    weight: "2.5 kg",
-    availableColors: ["Champagne Gold", "Ruby Red"],
-    tags: ["Diwali", "Festive", "Luxury Trunk"],
-    stock: 15,
+    description: "4-layer interactive handmade box that unfolds to reveal custom picture layouts, greetings, and a center compartment for a gift.",
+    materialUsed: "300GSM cardstock, satin ribbon, prints",
+    dimensions: "6 x 6 x 6 inches",
+    weight: "0.7 kg",
+    availableColors: ["Charcoal & Blush", "Royal Blue & Gold"],
+    tags: ["Explosion Box", "Birthday", "Handmade"],
+    stock: 20,
     isFeatured: true,
     variants: [
-      { name: "Classic Trunk", price: 7600, stock: 15 },
-      { name: "VIP Executive Gold", price: 11500, stock: 6 }
+      { name: "3-Layer Standard", price: 2990, stock: 15 },
+      { name: "4-Layer Deluxe", price: 3900, stock: 5 }
     ]
   },
   {
-    name: "Little Prince / Princess Newborn Welcome Chest",
-    sku: "BV-BABY-01",
-    category: "Baby Collection",
-    subCategory: "Newborn Welcome",
-    price: 9200,
-    discountPrice: 8400,
+    name: "Luxury Peacock Mirror Shagun Tray",
+    sku: "BV-WED-01",
+    category: "Wedding",
+    subCategory: "Shagun Trays",
+    price: 6800,
+    discountPrice: 5950,
     rating: 4.8,
     reviewCount: 14,
     images: [
-      "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800"
     ],
-    description: "Soft pastel pink and mint velvet trunk complete with customized baby milestone cards, organic cotton swaddle wrap, plush teddy, and baby detail keepsake box.",
-    materialUsed: "Pastel Velvet, Organic Cotton, Hand-carved Wooden Blocks",
-    dimensions: "15 x 11 x 7 inches",
-    weight: "2.1 kg",
-    availableColors: ["Baby Pink", "Soft Blue", "Mint Cream"],
-    tags: ["Baby Shower", "Newborn", "Personalized"],
-    stock: 9,
+    description: "Beautiful mirror base shagun tray lined with Jaipur gota lace, pearls, and royal peacock borders.",
+    materialUsed: "Mirror Glass, Gold Lace, Pearls",
+    dimensions: "16 x 12 x 4 inches",
+    weight: "1.8 kg",
+    availableColors: ["Gold Mirror", "Silver Lace"],
+    tags: ["Wedding", "Shagun", "Mirror Tray"],
+    stock: 15,
     isFeatured: true,
     variants: [
-      { name: "Pastel Keepsake Box", price: 8400, stock: 9 }
-    ]
-  },
-  {
-    name: "Customized 3D Floral Explosion Box & Memory Album",
-    sku: "BV-HANDMADE-01",
-    category: "Handmade Products",
-    subCategory: "Explosion Boxes",
-    price: 3400,
-    discountPrice: 2990,
-    rating: 4.9,
-    reviewCount: 56,
-    images: [
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800"
-    ],
-    description: "A 4-layer interactive explosion box unfolding to reveal custom photograph pop-ups, mini message scrolls, dried pressed flowers, and a central gift compartment.",
-    materialUsed: "Imported 300GSM Craft Paper, Satin Ribbon, Dried Flowers",
-    dimensions: "6 x 6 x 6 inches",
-    weight: "0.8 kg",
-    availableColors: ["Rose Gold", "Charcoal & Blush", "Lavender"],
-    tags: ["Explosion Box", "Handmade", "Custom Photos"],
-    stock: 20,
-    isFeatured: true,
-    isTrending: true,
-    variants: [
-      { name: "3-Layer Box", price: 2990, stock: 15 },
-      { name: "4-Layer Deluxe Box", price: 3900, stock: 5 }
-    ]
-  },
-  {
-    name: "Executive Artisan Velvet Corporate Hamper",
-    sku: "BV-CORP-01",
-    category: "Corporate Gifting",
-    subCategory: "Executive Kits",
-    price: 4500,
-    discountPrice: 3990,
-    rating: 4.9,
-    reviewCount: 22,
-    images: [
-      "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800"
-    ],
-    description: "Refined corporate kit with customized leather journal, brass pen, gold foil coaster set, gourmet dragees, and laser-engraved company logo tag.",
-    materialUsed: "Faux Leather, Stainless Brass, Premium Board",
-    dimensions: "12 x 9 x 4 inches",
-    weight: "1.4 kg",
-    availableColors: ["Charcoal Grey", "Midnight Blue", "Forest Green"],
-    tags: ["Corporate", "Branding", "Bulk Available"],
-    stock: 25,
-    isFeatured: true,
-    variants: [
-      { name: "Single Executive Box", price: 3990, stock: 25 }
+      { name: "Standard Size", price: 5950, stock: 15 }
     ]
   }
 ];

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Plus, Eye, EyeOff, Edit, Trash2 } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([
-    { _id: '1', name: 'Wedding Collection', slug: 'wedding-collection', description: 'Bridal Trousseau Packing, Shagun Trays & Royal Wedding Box Sets', sortOrder: 1, isVisible: true },
-    { _id: '2', name: 'Birthday Collection', slug: 'birthday-collection', description: 'Handcrafted Birthday Hampers, Keepsakes & Money Gift Boxes', sortOrder: 2, isVisible: true },
-    { _id: '3', name: 'Baby Collection', slug: 'baby-collection', description: 'Newborn Announcement Boxes, Naming Ceremony & Baby Shower Chests', sortOrder: 3, isVisible: true },
-    { _id: '4', name: 'Festival Collection', slug: 'festival-collection', description: 'Diwali Gold Foil Chests, Rakhi Hampers & Royal Karwa Chauth Trays', sortOrder: 4, isVisible: true },
-    { _id: '5', name: 'Corporate Gifting', slug: 'corporate-gifting', description: 'Customized Executive Hampers, Luxury Branding & Client Keepsakes', sortOrder: 5, isVisible: true },
-    { _id: '6', name: 'Handmade Products', slug: 'handmade-products', description: 'Customized Explosion Boxes, Velvet Greeting Cards & Memory Albums', sortOrder: 6, isVisible: true }
+    { _id: '1', name: 'Rakhi', slug: 'rakhi', description: 'Designer Rakhis, hampers, and custom greeting packs', sortOrder: 1, isVisible: true },
+    { _id: '2', name: 'Keychains', slug: 'keychains', description: 'Handcrafted customized name keychains & resin hooks', sortOrder: 2, isVisible: true },
+    { _id: '3', name: 'Birthday', slug: 'birthday', description: 'Exquisite personalized cards, surprise packs, and gift items', sortOrder: 3, isVisible: true }
   ]);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -21,7 +19,7 @@ export default function AdminCategories() {
   });
 
   useEffect(() => {
-    fetch('/api/categories')
+    fetch(getApiUrl('/api/categories'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) setCategories(data.data);
@@ -35,7 +33,7 @@ export default function AdminCategories() {
     const payload = { ...newCategory, slug };
 
     try {
-      const res = await fetch('/api/categories', {
+      const res = await fetch(getApiUrl('/api/categories'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -1,69 +1,69 @@
 import React, { useState } from 'react';
 import { Gift, Heart, Sparkles, Crown, Baby, Cake, Building, Palette, ArrowRight } from 'lucide-react';
 
-export default function ServicesGrid({ onSelectCategory, onOpenCustomOrder }) {
+export default function ServicesGrid({ onSelectCategory }) {
   const [hoveredCard, setHoveredCard] = useState(null);
 
   const services = [
     {
-      id: 'wedding',
-      title: 'Wedding Collection',
-      tagline: 'Royal Trousseau & Shagun Trays',
+      id: 'rakhi',
+      title: 'Rakhi',
+      tagline: 'Designer Rakhis & Combos',
       icon: <Crown size={28} color="#C8A45D" />,
+      image: 'https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&q=80&w=600',
+      categoryFilter: 'Rakhi',
+      items: ['Premium Pearl Rakhis', 'Silver Filigree Designs', 'Bhagat Rakhi Combos', 'Sweets & Chocolates Packs'],
+      badge: 'Festive Special'
+    },
+    {
+      id: 'keychains',
+      title: 'Keychains',
+      tagline: 'Bespoke Resin Art',
+      icon: <Palette size={28} color="#E8B7C9" />,
       image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Wedding Collection',
-      items: ['Bridal Trousseau Packing', 'Shagun Trays & Ring Boxes', 'Mehendi & Haldi Hampers', 'Sangeet Return Favors'],
-      badge: 'Bestseller'
+      categoryFilter: 'Keychains',
+      items: ['Custom Name Keychains', 'Rose Gold Glitter Charms', 'Photo Embed Keyrings', 'Premium Leather Key Loops'],
+      badge: 'Trending'
     },
     {
       id: 'birthday',
-      title: 'Birthday Collection',
-      tagline: 'Surprise Boxes & Money Hampers',
-      icon: <Cake size={28} color="#E8B7C9" />,
+      title: 'Birthday',
+      tagline: 'Personalized Greeting Packs',
+      icon: <Cake size={28} color="#C8A45D" />,
       image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Birthday Collection',
-      items: ['Birthday Gift Hampers', 'Personalized Money Boxes', 'Kids Birthday Surprises', 'Memory Scrapbooks'],
+      categoryFilter: 'Birthday',
+      items: ['Explosion Card Boxes', 'Gourmet Chocolate Tins', 'Special Message Scrolls', 'Decorated Keepsakes'],
       badge: 'Popular'
     },
     {
-      id: 'baby',
-      title: 'Baby Collection',
-      tagline: 'Newborn Welcome & Shower Chests',
-      icon: <Baby size={28} color="#C8A45D" />,
+      id: 'anniversary',
+      title: 'Anniversary',
+      tagline: 'Memorable Couple Gifts',
+      icon: <Heart size={28} color="#E8B7C9" />,
       image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Baby Collection',
-      items: ['Baby Shower Hampers', 'Newborn Welcome Chests', 'Naming Ceremony Gifts', 'Announcement Boxes'],
-      badge: 'Precious'
+      categoryFilter: 'Anniversary',
+      items: ['Custom Photo Scrapbooks', 'Engraved Brass Coasters', 'His & Hers Hamper Trays', 'Velvet Memory Albums'],
+      badge: 'Elegant'
     },
     {
-      id: 'festival',
-      title: 'Festival Collection',
-      tagline: 'Gold Foil Diwali & Rakhi Hampers',
-      icon: <Sparkles size={28} color="#E8B7C9" />,
-      image: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Festival Collection',
-      items: ['Diwali Gold Foil Trunks', 'Handmade Rakhi Hampers', 'Karwa Chauth Trays', 'Holi & Christmas Boxes'],
-      badge: 'Seasonal'
+      id: 'wedding',
+      title: 'Wedding',
+      tagline: 'Bridal Packing & Trays',
+      icon: <Crown size={28} color="#C8A45D" />,
+      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600',
+      categoryFilter: 'Wedding',
+      items: ['Velvet Trousseau Chests', 'Carved Mirror Shagun Trays', 'Traditional Gota Haldi Trays', 'Engagement Ring Boxes'],
+      badge: 'Maharani Class'
     },
     {
       id: 'corporate',
-      title: 'Corporate Gifting',
-      tagline: 'Executive Welcome & Client Kits',
-      icon: <Building size={28} color="#C8A45D" />,
+      title: 'Corporate',
+      tagline: 'Welcome Kits & Branding',
+      icon: <Building size={28} color="#E8B7C9" />,
       image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Corporate Gifting',
-      items: ['Employee Welcome Kits', 'Client Appreciation Hampers', 'Festive Corporate Branding', 'Event Gift Trunks'],
+      categoryFilter: 'Corporate',
+      items: ['Leather Journal Planners', 'VIP Executive Gift Trunks', 'Branded Metal Pens', 'Custom Client Appreciation Packs'],
       badge: 'Bulk Discount'
-    },
-    {
-      id: 'handmade',
-      title: 'Handmade Products',
-      tagline: 'Explosion Boxes & Velvet Cards',
-      icon: <Palette size={28} color="#E8B7C9" />,
-      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Handmade Products',
-      items: ['3D Photo Explosion Boxes', 'Handcrafted Velvet Cards', 'Custom Gift Tags', 'Floral Packaging'],
-      badge: 'Customizable'
     }
   ];
 
@@ -78,7 +78,7 @@ export default function ServicesGrid({ onSelectCategory, onOpenCustomOrder }) {
             Handcrafted for <span className="title-gold-gradient">Every Celebration</span>
           </h2>
           <p style={{ color: '#4A4A4A', fontSize: '1.05rem', lineHeight: 1.7 }}>
-            Explore our themed hampers. Hover over any gift box card to unlock the handcrafted treasures inside.
+            Explore our handcrafted collections. Click on any category to view and order premium designer gifts.
           </p>
         </div>
 
@@ -189,35 +189,20 @@ export default function ServicesGrid({ onSelectCategory, onOpenCustomOrder }) {
                         background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)',
                         border: '1px solid #C8A45D',
                         color: '#2E2E2E',
-                        padding: '10px',
+                        padding: '12px',
                         borderRadius: '20px',
                         fontWeight: 600,
-                        fontSize: '0.85rem',
+                        fontSize: '0.88rem',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
                       }}
                     >
-                      <span>Explore</span>
+                      <span>Explore Category</span>
                       <ArrowRight size={14} />
-                    </button>
-
-                    <button
-                      onClick={onOpenCustomOrder}
-                      style={{
-                        background: '#2E2E2E',
-                        color: '#F4E8C1',
-                        border: 'none',
-                        padding: '10px 16px',
-                        borderRadius: '20px',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Customize
                     </button>
                   </div>
                 </div>

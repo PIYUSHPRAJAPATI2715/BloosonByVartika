@@ -5,10 +5,6 @@ import AboutSection from './components/Storefront/AboutSection';
 import ServicesGrid from './components/Storefront/ServicesGrid';
 import ProductGallery from './components/Storefront/ProductGallery';
 import ProductModal from './components/Storefront/ProductModal';
-import HamperBuilderModal from './components/Storefront/HamperBuilderModal';
-import GiftQuizModal from './components/Storefront/GiftQuizModal';
-import TrousseauPlanner from './components/Storefront/TrousseauPlanner';
-import CustomOrderModal from './components/Storefront/CustomOrderModal';
 import OrderTrackerModal from './components/Storefront/OrderTrackerModal';
 import AllProductsModal from './components/Storefront/AllProductsModal';
 import CartDrawer from './components/Storefront/CartDrawer';
@@ -191,10 +187,6 @@ export default function App() {
   
   // Modals visibility
   const [activeQuickViewProduct, setActiveQuickViewProduct] = useState(null);
-  const [isHamperBuilderOpen, setIsHamperBuilderOpen] = useState(false);
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
-  const [isCustomOrderOpen, setIsCustomOrderOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isAllProductsOpen, setIsAllProductsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -355,17 +347,6 @@ export default function App() {
           <Navbar 
             cartCount={cartItems.reduce((sum, i) => sum + i.quantity, 0)}
             onOpenCart={() => setIsCartOpen(true)}
-            onOpenCustomOrder={() => {
-              if (!currentUser) {
-                setAuthModalMode('user');
-                setAuthModalOpen(true);
-              } else {
-                setIsCustomOrderOpen(true);
-              }
-            }}
-            onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
-            onOpenQuiz={() => setIsQuizOpen(true)}
-            onOpenPlanner={() => setIsPlannerOpen(true)}
             onOpenOrderTracker={() => setIsOrderTrackerOpen(true)}
             currentUser={currentUser}
             onOpenAuthModal={(m) => { setAuthModalMode(m); setAuthModalOpen(true); }}
@@ -375,33 +356,15 @@ export default function App() {
 
           <Hero 
             settings={websiteSettings}
-            onOpenCustomOrder={() => {
-              if (!currentUser) {
-                setAuthModalMode('user');
-                setAuthModalOpen(true);
-              } else {
-                setIsCustomOrderOpen(true);
-              }
-            }}
-            onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
-            onOpenQuiz={() => setIsQuizOpen(true)}
           />
 
-          <AboutSection />
+          <AboutSection websiteSettings={websiteSettings} />
 
           <ServicesGrid 
             onSelectCategory={(cat) => {
               setSelectedCategory(cat);
               const el = document.getElementById('collection');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            onOpenCustomOrder={() => {
-              if (!currentUser) {
-                setAuthModalMode('user');
-                setAuthModalOpen(true);
-              } else {
-                setIsCustomOrderOpen(true);
-              }
             }}
           />
 
@@ -411,11 +374,10 @@ export default function App() {
             onSelectCategory={setSelectedCategory}
             onQuickView={(p) => setActiveQuickViewProduct(p)}
             onAddToCart={(p) => handleAddToCart(p, 'Standard', 1)}
-            onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
             onOpenAllProducts={() => setIsAllProductsOpen(true)}
           />
 
-          <ProcessSection />
+          <ProcessSection websiteSettings={websiteSettings} />
 
           <Testimonials />
 
@@ -424,9 +386,6 @@ export default function App() {
           <ContactSection websiteSettings={websiteSettings} />
 
           <Footer 
-            onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
-            onOpenHamperBuilder={() => setIsHamperBuilderOpen(true)}
-            onOpenQuiz={() => setIsQuizOpen(true)}
             websiteSettings={websiteSettings}
           />
         </div>
@@ -448,34 +407,6 @@ export default function App() {
         />
       )}
 
-      {isHamperBuilderOpen && (
-        <HamperBuilderModal 
-          onClose={() => setIsHamperBuilderOpen(false)}
-          onAddToCart={handleAddToCart}
-        />
-      )}
-
-      {isQuizOpen && (
-        <GiftQuizModal 
-          products={products}
-          onClose={() => setIsQuizOpen(false)}
-          onSelectProduct={(p) => setActiveQuickViewProduct(p)}
-        />
-      )}
-
-      {isPlannerOpen && (
-        <TrousseauPlanner 
-          onClose={() => setIsPlannerOpen(false)}
-          onOpenCustomOrder={() => setIsCustomOrderOpen(true)}
-        />
-      )}
-
-      {isCustomOrderOpen && (
-        <CustomOrderModal 
-          onClose={() => setIsCustomOrderOpen(false)}
-        />
-      )}
-
       {isOrderTrackerOpen && (
         <OrderTrackerModal 
           onClose={() => setIsOrderTrackerOpen(false)}
@@ -488,7 +419,6 @@ export default function App() {
         products={products}
         onQuickView={(p) => setActiveQuickViewProduct(p)}
         onAddToCart={handleAddToCart}
-        onOpenHamperBuilder={() => { setIsAllProductsOpen(false); setIsHamperBuilderOpen(true); }}
       />
 
       <CartDrawer 
