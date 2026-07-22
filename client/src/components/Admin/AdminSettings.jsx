@@ -275,6 +275,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
                   <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Founder Photo</label>
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
                     <label 
+                      htmlFor="founder-photo-upload-input"
                       style={{
                         flex: 1,
                         background: 'rgba(200, 164, 93, 0.1)',
@@ -293,6 +294,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
                     >
                       Upload File
                       <input 
+                        id="founder-photo-upload-input"
                         type="file" 
                         accept="image/*" 
                         onChange={handleImageUpload} 

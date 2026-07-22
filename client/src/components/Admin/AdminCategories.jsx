@@ -323,6 +323,7 @@ export default function AdminCategories() {
                 <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Banner Image</label>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                   <label 
+                    htmlFor="category-banner-upload-add"
                     style={{
                       flex: 1,
                       background: 'rgba(200, 164, 93, 0.1)',
@@ -341,6 +342,7 @@ export default function AdminCategories() {
                   >
                     Upload File
                     <input 
+                      id="category-banner-upload-add"
                       type="file" 
                       accept="image/*" 
                       onChange={e => handleBannerUpload(e, false)} 
@@ -434,6 +436,7 @@ export default function AdminCategories() {
                 <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Banner Image</label>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                   <label 
+                    htmlFor="category-banner-upload-edit"
                     style={{
                       flex: 1,
                       background: 'rgba(200, 164, 93, 0.1)',
@@ -452,6 +455,7 @@ export default function AdminCategories() {
                   >
                     Upload File
                     <input 
+                      id="category-banner-upload-edit"
                       type="file" 
                       accept="image/*" 
                       onChange={e => handleBannerUpload(e, true)} 
