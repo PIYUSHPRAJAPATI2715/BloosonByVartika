@@ -90,7 +90,6 @@ export default function AdminProducts() {
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
-        img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const maxDim = 800;
@@ -117,6 +116,7 @@ export default function AdminProducts() {
           const compressed = canvas.toDataURL('image/jpeg', 0.75);
           setFormData({ ...formData, imageUrl: compressed });
         };
+        img.src = event.target.result;
       };
     }
   };

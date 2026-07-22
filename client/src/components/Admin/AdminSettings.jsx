@@ -37,7 +37,6 @@ export default function AdminSettings({ onSettingsUpdated }) {
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
-        img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const maxDim = 800;
@@ -64,6 +63,7 @@ export default function AdminSettings({ onSettingsUpdated }) {
           const compressed = canvas.toDataURL('image/jpeg', 0.75);
           setSettings(prev => ({ ...prev, aboutImage: compressed }));
         };
+        img.src = event.target.result;
       };
     }
   };

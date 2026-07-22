@@ -25,7 +25,6 @@ export default function AdminCategories() {
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
-        img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const maxDim = 1000;
@@ -56,6 +55,7 @@ export default function AdminCategories() {
             setNewCategory(prev => ({ ...prev, banner: compressed }));
           }
         };
+        img.src = event.target.result;
       };
     }
   };
