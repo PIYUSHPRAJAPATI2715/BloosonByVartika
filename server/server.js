@@ -10,7 +10,42 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Connect Database
-connectDB();
+connectDB().then(async () => {
+  try {
+    const Setting = require('./models/Setting');
+    const settings = await Setting.findOne();
+    if (settings) {
+      let changed = false;
+      const fields = ['announcementText', 'heroHeading', 'heroSubheading', 'aboutTitle', 'aboutHeading', 'aboutDescription'];
+      fields.forEach(f => {
+        if (settings[f]) {
+          let val = settings[f];
+          if (val.includes('(Updated via API)')) {
+            val = val.replace('(Updated via API)', '').trim();
+            settings[f] = val;
+            changed = true;
+          }
+          if (val.includes('(UPDATED)')) {
+            val = val.replace('(UPDATED)', '').trim();
+            settings[f] = val;
+            changed = true;
+          }
+          if (val.endsWith('•') || val.endsWith('-')) {
+            val = val.slice(0, -1).trim();
+            settings[f] = val;
+            changed = true;
+          }
+        }
+      });
+      if (changed) {
+        await settings.save();
+        console.log("🌸 Startup DB Cleanup: Removed '(Updated via API)' successfully!");
+      }
+    }
+  } catch (dbErr) {
+    console.error("Startup DB clean error:", dbErr);
+  }
+}).catch(err => console.warn("Startup connectDB callback error:", err));
 
 // Middleware
 app.use(cors());

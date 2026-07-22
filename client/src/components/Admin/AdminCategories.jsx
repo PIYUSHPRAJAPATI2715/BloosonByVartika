@@ -33,14 +33,17 @@ export default function AdminCategories() {
     }
   };
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Fetch all categories for admin (including invisible ones)
+  // Fetch all categories for admin (including invisible ones) with pagination
   const fetchCategories = () => {
     setLoading(true);
     setError(null);
-    fetch(getApiUrl('/api/categories?admin=true'))
+    const url = getApiUrl(`/api/categories?admin=true&page=${page}&limit=${pageSize}`);
+    fetch(url)
       .then(res => {
         if (!res.ok) throw new Error("Server returned status " + res.status);
         return res.json();
@@ -48,6 +51,8 @@ export default function AdminCategories() {
       .then(data => {
         if (data.success && data.data) {
           setCategories(data.data);
+          setTotalPages(data.totalPages || 1);
+          setTotalCount(data.totalCount || data.data.length);
         } else {
           setError(data.message || "Failed to load categories");
         }
@@ -60,9 +65,17 @@ export default function AdminCategories() {
       });
   };
 
+  // Refetch when page changes
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [page]);
+
+  const handlePrev = () => {
+    if (page > 1) setPage(page - 1);
+  };
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();

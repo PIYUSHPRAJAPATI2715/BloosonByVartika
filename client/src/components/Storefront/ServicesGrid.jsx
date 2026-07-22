@@ -159,15 +159,13 @@ export default function ServicesGrid({ onSelectCategory }) {
             return (
               <div
                 key={service.id}
+                className="tilt-card-3d"
                 onMouseEnter={() => setHoveredCard(service.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
                   background: '#FFFFFF',
                   borderRadius: '24px',
                   border: isHovered ? '2px solid #C8A45D' : '1px solid rgba(232, 183, 201, 0.4)',
-                  boxShadow: isHovered ? '0 20px 40px rgba(200, 164, 93, 0.25)' : '0 10px 30px rgba(0,0,0,0.04)',
-                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                  transform: isHovered ? 'translateY(-8px)' : 'none',
                   overflow: 'hidden',
                   position: 'relative',
                   display: 'flex',

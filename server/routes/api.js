@@ -163,9 +163,27 @@ router.delete('/products/:id', async (req, res) => {
 // --- CATEGORIES ---
 router.get('/categories', async (req, res) => {
   try {
+    // Pagination parameters
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20; // default 20 per page
+    const skip = (page - 1) * limit;
+
     const filter = req.query.admin === 'true' ? {} : { isVisible: true };
-    const categories = await Category.find(filter).sort({ sortOrder: 1 });
-    res.json({ success: true, data: categories });
+    const totalCount = await Category.countDocuments(filter);
+    const totalPages = Math.ceil(totalCount / limit) || 1;
+
+    const categories = await Category.find(filter)
+      .sort({ sortOrder: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      success: true,
+      data: categories,
+      page,
+      totalPages,
+      totalCount,
+    });
   } catch (err) {
     res.json({ success: false, data: [] });
   }
