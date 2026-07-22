@@ -6,7 +6,8 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
 
-  const [categories, setCategories] = useState(['All']);
+  const [categories, setCategories] = useState([]);
+  const [catsLoading, setCatsLoading] = useState(true);
 
   useEffect(() => {
     fetch(getApiUrl('/api/categories'))
@@ -15,12 +16,11 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
         if (data.success && data.data && data.data.length > 0) {
           setCategories(['All', ...data.data.map(c => c.name)]);
         }
+        setCatsLoading(false);
       })
       .catch(err => {
-        // Fallback categories
-        setCategories([
-          'All', 'Rakhi', 'Keychains', 'Birthday', 'Anniversary', 'Wedding', 'Corporate', 'Baby Shower', 'Explosion Boxes', 'Festive'
-        ]);
+        console.warn('Category fetch error:', err);
+        setCatsLoading(false);
       });
   }, []);
 
@@ -73,7 +73,16 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
               gap: '10px'
             }}
           >
-            {categories.map((cat) => (
+          {catsLoading
+            ? [1,2,3,4].map(i => (
+                <div key={i} style={{
+                  width: '80px', height: '36px', borderRadius: '20px',
+                  background: 'linear-gradient(90deg,#f0e0e0 25%,#fdf5f5 50%,#f0e0e0 75%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 1.4s infinite'
+                }} />
+              ))
+            : categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => onSelectCategory(cat)}

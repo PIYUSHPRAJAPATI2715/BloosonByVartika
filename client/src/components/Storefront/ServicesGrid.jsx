@@ -5,71 +5,10 @@ import { getApiUrl } from '../../config/api';
 export default function ServicesGrid({ onSelectCategory }) {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const fallbackServices = [
-    {
-      id: 'rakhi',
-      title: 'Rakhi',
-      tagline: 'Designer Rakhis & Combos',
-      icon: <Crown size={28} color="#C8A45D" />,
-      image: 'https://images.unsplash.com/photo-1627856013091-fed6e4e30025?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Rakhi',
-      items: ['Premium Pearl Rakhis', 'Silver Filigree Designs', 'Bhagat Rakhi Combos', 'Sweets & Chocolates Packs'],
-      badge: 'Festive Special'
-    },
-    {
-      id: 'keychains',
-      title: 'Keychains',
-      tagline: 'Bespoke Resin Art',
-      icon: <Palette size={28} color="#E8B7C9" />,
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Keychains',
-      items: ['Custom Name Keychains', 'Rose Gold Glitter Charms', 'Photo Embed Keyrings', 'Premium Leather Key Loops'],
-      badge: 'Trending'
-    },
-    {
-      id: 'birthday',
-      title: 'Birthday',
-      tagline: 'Personalized Greeting Packs',
-      icon: <Cake size={28} color="#C8A45D" />,
-      image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Birthday',
-      items: ['Explosion Card Boxes', 'Gourmet Chocolate Tins', 'Special Message Scrolls', 'Decorated Keepsakes'],
-      badge: 'Popular'
-    },
-    {
-      id: 'anniversary',
-      title: 'Anniversary',
-      tagline: 'Memorable Couple Gifts',
-      icon: <Heart size={28} color="#E8B7C9" />,
-      image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Anniversary',
-      items: ['Custom Photo Scrapbooks', 'Engraved Brass Coasters', 'His & Hers Hamper Trays', 'Velvet Memory Albums'],
-      badge: 'Elegant'
-    },
-    {
-      id: 'wedding',
-      title: 'Wedding',
-      tagline: 'Bridal Packing & Trays',
-      icon: <Crown size={28} color="#C8A45D" />,
-      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Wedding',
-      items: ['Velvet Trousseau Chests', 'Carved Mirror Shagun Trays', 'Traditional Gota Haldi Trays', 'Engagement Ring Boxes'],
-      badge: 'Maharani Class'
-    },
-    {
-      id: 'corporate',
-      title: 'Corporate',
-      tagline: 'Welcome Kits & Branding',
-      icon: <Building size={28} color="#E8B7C9" />,
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-      categoryFilter: 'Corporate',
-      items: ['Leather Journal Planners', 'VIP Executive Gift Trunks', 'Branded Metal Pens', 'Custom Client Appreciation Packs'],
-      badge: 'Bulk Discount'
-    }
-  ];
-
-  useEffect(() => {
+  const loadCategories = () => {
+    setLoading(true);
     fetch(getApiUrl('/api/categories'))
       .then(res => res.json())
       .then(data => {
@@ -124,14 +63,27 @@ export default function ServicesGrid({ onSelectCategory }) {
           });
           setServices(mapped);
         }
+        setLoading(false);
       })
-      .catch(err => console.warn("Services grid fetch fallback:", err));
-  }, []);
+      .catch(err => {
+        console.warn("Services grid fetch error:", err);
+        setLoading(false);
+      });
+  };
 
-  const displayServices = services.length > 0 ? services : fallbackServices;
+  useEffect(() => { loadCategories(); }, []);
+
+  // Skeleton loader animation style
+  const skeletonStyle = {
+    background: 'linear-gradient(90deg, #f0e8e8 25%, #fdf5f5 50%, #f0e8e8 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'shimmer 1.4s infinite',
+    borderRadius: '12px'
+  };
 
   return (
     <section id="services" style={{ padding: '90px 24px', background: 'var(--cream-bg)' }}>
+      <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
         
         {/* Header */}
@@ -145,8 +97,34 @@ export default function ServicesGrid({ onSelectCategory }) {
           </p>
         </div>
 
+        {/* Loading skeleton */}
+        {loading && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '32px' }}>
+            {[1,2,3].map(i => (
+              <div key={i} style={{ background: '#fff', borderRadius: '24px', border: '1px solid rgba(232,183,201,0.3)', overflow: 'hidden' }}>
+                <div style={{ ...skeletonStyle, height: '220px', borderRadius: 0 }} />
+                <div style={{ padding: '24px' }}>
+                  <div style={{ ...skeletonStyle, height: '16px', width: '60%', marginBottom: '12px' }} />
+                  <div style={{ ...skeletonStyle, height: '12px', width: '90%', marginBottom: '8px' }} />
+                  <div style={{ ...skeletonStyle, height: '12px', width: '75%', marginBottom: '8px' }} />
+                  <div style={{ ...skeletonStyle, height: '12px', width: '80%', marginBottom: '20px' }} />
+                  <div style={{ ...skeletonStyle, height: '44px', borderRadius: '20px' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No categories yet */}
+        {!loading && services.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888' }}>
+            <p style={{ fontSize: '1.1rem', marginBottom: '16px' }}>No categories added yet.</p>
+            <p style={{ fontSize: '0.9rem' }}>Add categories from the Admin panel to display them here.</p>
+          </div>
+        )}
+
         {/* Services Grid */}
-        <div 
+        {!loading && services.length > 0 && <div 
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
@@ -271,7 +249,7 @@ export default function ServicesGrid({ onSelectCategory }) {
               </div>
             );
           })}
-        </div>
+        </div>}
 
       </div>
     </section>
