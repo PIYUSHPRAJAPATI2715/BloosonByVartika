@@ -1,30 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Plus, Eye, EyeOff, Edit, Trash2 } from 'lucide-react';
+import { Layers, Plus, Eye, EyeOff, Edit, Trash2, Save, X, Image } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
 export default function AdminCategories() {
-  const [categories, setCategories] = useState([
-    { _id: '1', name: 'Rakhi', slug: 'rakhi', description: 'Designer Rakhis, hampers, and custom greeting packs', sortOrder: 1, isVisible: true },
-    { _id: '2', name: 'Keychains', slug: 'keychains', description: 'Handcrafted customized name keychains & resin hooks', sortOrder: 2, isVisible: true },
-    { _id: '3', name: 'Birthday', slug: 'birthday', description: 'Exquisite personalized cards, surprise packs, and gift items', sortOrder: 3, isVisible: true }
-  ]);
-
+  const [categories, setCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  
   const [newCategory, setNewCategory] = useState({
     name: '',
     slug: '',
     description: '',
-    sortOrder: 7,
+    banner: '',
+    sortOrder: 1,
     isVisible: true
   });
 
-  useEffect(() => {
-    fetch(getApiUrl('/api/categories'))
+  const [editingCategory, setEditingCategory] = useState(null);
+
+  // Fetch all categories for admin (including invisible ones)
+  const fetchCategories = () => {
+    fetch(getApiUrl('/api/categories?admin=true'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) setCategories(data.data);
+        if (data.success && data.data) {
+          setCategories(data.data);
+        }
       })
       .catch(err => console.warn("Categories fetch fallback:", err));
+  };
+
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
   const handleCreate = async (e) => {
@@ -42,28 +49,84 @@ export default function AdminCategories() {
       if (data.success && data.data) {
         setCategories([...categories, data.data]);
       } else {
-        setCategories([...categories, { ...payload, _id: Date.now().toString() }]);
+        fetchCategories();
       }
     } catch (err) {
-      setCategories([...categories, { ...payload, _id: Date.now().toString() }]);
+      fetchCategories();
     }
     setShowAddModal(false);
-    setNewCategory({ name: '', slug: '', description: '', sortOrder: 7, isVisible: true });
+    setNewCategory({ name: '', slug: '', description: '', banner: '', sortOrder: categories.length + 1, isVisible: true });
   };
 
-  const toggleVisibility = (id) => {
-    setCategories(categories.map(c => c._id === id ? { ...c, isVisible: !c.isVisible } : c));
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const slug = editingCategory.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const payload = { ...editingCategory, slug };
+
+    try {
+      const res = await fetch(getApiUrl(`/api/categories/${editingCategory._id}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setCategories(categories.map(c => c._id === editingCategory._id ? data.data : c));
+      } else {
+        fetchCategories();
+      }
+    } catch (err) {
+      fetchCategories();
+    }
+    setShowEditModal(false);
+    setEditingCategory(null);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this category? All products under this category might need their category updated.")) return;
+
+    try {
+      const res = await fetch(getApiUrl(`/api/categories/${id}`), {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCategories(categories.filter(c => c._id !== id));
+      } else {
+        fetchCategories();
+      }
+    } catch (err) {
+      fetchCategories();
+    }
+  };
+
+  const toggleVisibility = async (cat) => {
+    const updatedVisible = !cat.isVisible;
+    try {
+      const res = await fetch(getApiUrl(`/api/categories/${cat._id}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isVisible: updatedVisible })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setCategories(categories.map(c => c._id === cat._id ? data.data : c));
+      }
+    } catch (err) {
+      setCategories(categories.map(c => c._id === cat._id ? { ...c, isVisible: updatedVisible } : c));
+    }
   };
 
   return (
     <div>
+      {/* Title Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
         <div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#F4E8C1', margin: 0 }}>
-            Category Management
+            Category Manager
           </h1>
           <p style={{ color: '#AAA', fontSize: '0.88rem' }}>
-            Create and manage luxury product categories shown across the storefront.
+            Add, edit, delete, and configure images for storefront collections.
           </p>
         </div>
 
@@ -72,50 +135,276 @@ export default function AdminCategories() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      {/* Categories Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
         {categories.map((cat) => (
-          <div key={cat._id} style={{ background: '#282828', borderRadius: '18px', padding: '20px', border: '1px solid rgba(200, 164, 93, 0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.2rem', color: '#FFF', margin: 0 }}>{cat.name}</h3>
-                <button onClick={() => toggleVisibility(cat._id)} style={{ background: 'none', border: 'none', color: cat.isVisible ? '#4CAF50' : '#888', cursor: 'pointer' }}>
+          <div 
+            key={cat._id} 
+            style={{ 
+              background: '#282828', 
+              borderRadius: '20px', 
+              overflow: 'hidden',
+              border: '1px solid rgba(200, 164, 93, 0.3)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'space-between',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+            }}
+          >
+            {/* Category Banner Cover */}
+            <div style={{ position: 'relative', height: '140px', background: '#333' }}>
+              {cat.banner ? (
+                <img 
+                  src={cat.banner} 
+                  alt={cat.name} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#666', gap: '8px' }}>
+                  <Image size={32} />
+                  <span style={{ fontSize: '0.75rem' }}>No Banner Uploaded</span>
+                </div>
+              )}
+              {/* Badge Visibility */}
+              <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
+                <button 
+                  onClick={() => toggleVisibility(cat)} 
+                  style={{ 
+                    background: 'rgba(0,0,0,0.6)', 
+                    border: 'none', 
+                    borderRadius: '50%', 
+                    width: '34px', 
+                    height: '34px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    color: cat.isVisible ? '#4CAF50' : '#E57373', 
+                    cursor: 'pointer' 
+                  }}
+                  title={cat.isVisible ? 'Visible on Storefront' : 'Hidden from Storefront'}
+                >
                   {cat.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
               </div>
-              <p style={{ fontSize: '0.82rem', color: '#AAA', marginBottom: '12px' }}>{cat.description}</p>
-              <span style={{ fontSize: '0.75rem', color: '#C8A45D' }}>Slug: /{cat.slug}</span>
             </div>
+
+            {/* Category Details */}
+            <div style={{ padding: '20px', flexGrow: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', color: '#FFF', margin: 0 }}>
+                  {cat.name}
+                </h3>
+                <span style={{ fontSize: '0.72rem', background: '#3A3A3A', color: '#C8A45D', padding: '3px 8px', borderRadius: '8px', fontWeight: 600 }}>
+                  Order: {cat.sortOrder || 0}
+                </span>
+              </div>
+              
+              <p style={{ fontSize: '0.82rem', color: '#AAA', lineHeight: '1.5', minHeight: '36px', margin: '0 0 16px' }}>
+                {cat.description || 'No description provided.'}
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.72rem', color: '#888' }}>
+                  Slug: <span style={{ color: '#C8A45D' }}>/{cat.slug}</span>
+                </span>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    onClick={() => { setEditingCategory(cat); setShowEditModal(true); }}
+                    style={{ 
+                      background: 'rgba(200, 164, 93, 0.1)', 
+                      border: '1px solid rgba(200, 164, 93, 0.3)', 
+                      borderRadius: '8px', 
+                      color: '#C8A45D', 
+                      padding: '6px 10px', 
+                      fontSize: '0.75rem', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontWeight: 600
+                    }}
+                  >
+                    <Edit size={14} /> Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(cat._id)}
+                    style={{ 
+                      background: 'rgba(229, 115, 115, 0.1)', 
+                      border: '1px solid rgba(229, 115, 115, 0.3)', 
+                      borderRadius: '8px', 
+                      color: '#E57373', 
+                      padding: '6px 10px', 
+                      fontSize: '0.75rem', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontWeight: 600
+                    }}
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
         ))}
       </div>
 
+      {/* --- ADD CATEGORY MODAL --- */}
       {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#282828', borderRadius: '20px', padding: '28px', maxWidth: '480px', width: '100%', border: '1px solid #C8A45D' }}>
-            <h3 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.3rem', marginBottom: '16px' }}>
-              Add Luxury Category
-            </h3>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#282828', borderRadius: '24px', padding: '30px', maxWidth: '500px', width: '100%', border: '1px solid #C8A45D' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.4rem', margin: 0 }}>
+                Add Luxury Category
+              </h3>
+              <button onClick={() => setShowAddModal(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
 
-            <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Category Name *</label>
-                <input type="text" required placeholder="e.g. Mehendi & Haldi Hampers" value={newCategory.name} onChange={e => setNewCategory({...newCategory, name: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Name *</label>
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="e.g. Wedding Trunks & Chests" 
+                  value={newCategory.name} 
+                  onChange={e => setNewCategory({...newCategory, name: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.8rem', color: '#AAA' }}>Description</label>
-                <textarea rows={3} placeholder="Brief summary of category items..." value={newCategory.description} onChange={e => setNewCategory({...newCategory, description: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', outline: 'none' }} />
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Banner Image URL</label>
+                <input 
+                  type="text" 
+                  placeholder="https://images.unsplash.com/... or Google Image link" 
+                  value={newCategory.banner} 
+                  onChange={e => setNewCategory({...newCategory, banner: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="button" onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#444', color: '#FFF', border: 'none', padding: '10px', borderRadius: '10px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" className="btn-gold" style={{ flex: 2, justifyContent: 'center' }}>Save Category</button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Display Order</label>
+                  <input 
+                    type="number" 
+                    value={newCategory.sortOrder} 
+                    onChange={e => setNewCategory({...newCategory, sortOrder: parseInt(e.target.value) || 1})} 
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Storefront Visibility</label>
+                  <select 
+                    value={newCategory.isVisible} 
+                    onChange={e => setNewCategory({...newCategory, isVisible: e.target.value === 'true'})}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }}
+                  >
+                    <option value="true">Visible</option>
+                    <option value="false">Hidden</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Description</label>
+                <textarea 
+                  rows={3} 
+                  placeholder="Brief description of products inside this collection..." 
+                  value={newCategory.description} 
+                  onChange={e => setNewCategory({...newCategory, description: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                <button type="button" onClick={() => setShowAddModal(false)} style={{ flex: 1, background: '#444', color: '#FFF', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="submit" className="btn-gold" style={{ flex: 2, justifyContent: 'center' }}>Create Collection</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* --- EDIT CATEGORY MODAL --- */}
+      {showEditModal && editingCategory && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#282828', borderRadius: '24px', padding: '30px', maxWidth: '500px', width: '100%', border: '1px solid #C8A45D' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.4rem', margin: 0 }}>
+                Edit Luxury Category
+              </h3>
+              <button onClick={() => { setShowEditModal(false); setEditingCategory(null); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Name *</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={editingCategory.name} 
+                  onChange={e => setEditingCategory({...editingCategory, name: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Banner Image URL</label>
+                <input 
+                  type="text" 
+                  value={editingCategory.banner || ''} 
+                  onChange={e => setEditingCategory({...editingCategory, banner: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Display Order</label>
+                  <input 
+                    type="number" 
+                    value={editingCategory.sortOrder} 
+                    onChange={e => setEditingCategory({...editingCategory, sortOrder: parseInt(e.target.value) || 1})} 
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Storefront Visibility</label>
+                  <select 
+                    value={editingCategory.isVisible} 
+                    onChange={e => setEditingCategory({...editingCategory, isVisible: e.target.value === 'true'})}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }}
+                  >
+                    <option value="true">Visible</option>
+                    <option value="false">Hidden</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Description</label>
+                <textarea 
+                  rows={3} 
+                  value={editingCategory.description || ''} 
+                  onChange={e => setEditingCategory({...editingCategory, description: e.target.value})} 
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                <button type="button" onClick={() => { setShowEditModal(false); setEditingCategory(null); }} style={{ flex: 1, background: '#444', color: '#FFF', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="submit" className="btn-gold" style={{ flex: 2, justifyContent: 'center' }}>Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

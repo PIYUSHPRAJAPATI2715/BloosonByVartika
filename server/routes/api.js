@@ -163,10 +163,11 @@ router.delete('/products/:id', async (req, res) => {
 // --- CATEGORIES ---
 router.get('/categories', async (req, res) => {
   try {
-    const categories = await Category.find({ isVisible: true }).sort({ sortOrder: 1 });
+    const filter = req.query.admin === 'true' ? {} : { isVisible: true };
+    const categories = await Category.find(filter).sort({ sortOrder: 1 });
     res.json({ success: true, data: categories });
   } catch (err) {
-    res.json({ success: true, data: [] });
+    res.json({ success: false, data: [] });
   }
 });
 
@@ -174,6 +175,24 @@ router.post('/categories', async (req, res) => {
   try {
     const category = await Category.create(req.body);
     res.status(201).json({ success: true, data: category });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+router.put('/categories/:id', async (req, res) => {
+  try {
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ success: true, data: category });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/categories/:id', async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Category deleted successfully" });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
