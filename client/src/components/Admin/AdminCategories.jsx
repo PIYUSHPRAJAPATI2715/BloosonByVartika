@@ -22,14 +22,41 @@ export default function AdminCategories() {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        if (isEdit) {
-          setEditingCategory(prev => ({ ...prev, banner: reader.result }));
-        } else {
-          setNewCategory(prev => ({ ...prev, banner: reader.result }));
-        }
-      };
       reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1000;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          if (isEdit) {
+            setEditingCategory(prev => ({ ...prev, banner: compressed }));
+          } else {
+            setNewCategory(prev => ({ ...prev, banner: compressed }));
+          }
+        };
+      };
     }
   };
 
