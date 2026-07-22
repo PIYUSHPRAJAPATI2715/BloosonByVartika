@@ -586,15 +586,46 @@ router.get('/settings', async (req, res) => {
 
 router.put('/settings', async (req, res) => {
   try {
+    // Strip any accidental "(Updated via API)" or "(UPDATED)" from incoming data
+    const sanitize = (val) => typeof val === 'string'
+      ? val.replace(/\(Updated via API\)/gi, '').replace(/\(UPDATED\)/gi, '').replace(/[•\-]$/, '').trim()
+      : val;
+    const fieldsToSanitize = ['announcementText','heroHeading','heroSubheading','aboutTitle','aboutHeading','aboutDescription'];
+    const cleanBody = { ...req.body };
+    fieldsToSanitize.forEach(f => { if (cleanBody[f]) cleanBody[f] = sanitize(cleanBody[f]); });
+
     let settings = await Setting.findOne();
     if (!settings) {
-      settings = await Setting.create(req.body);
+      settings = await Setting.create(cleanBody);
     } else {
-      settings = await Setting.findByIdAndUpdate(settings._id, req.body, { new: true });
+      settings = await Setting.findByIdAndUpdate(settings._id, cleanBody, { new: true });
     }
     res.json({ success: true, data: settings });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+// One-time force-clean: removes (Updated via API) etc from DB immediately
+router.get('/settings/clean', async (req, res) => {
+  try {
+    const settings = await Setting.findOne();
+    if (!settings) return res.json({ success: false, message: 'No settings found' });
+    const sanitize = (val) => typeof val === 'string'
+      ? val.replace(/\(Updated via API\)/gi, '').replace(/\(UPDATED\)/gi, '').replace(/[•\-]$/, '').trim()
+      : val;
+    const fields = ['announcementText','heroHeading','heroSubheading','aboutTitle','aboutHeading','aboutDescription'];
+    let changed = false;
+    fields.forEach(f => {
+      if (settings[f]) {
+        const clean = sanitize(settings[f]);
+        if (clean !== settings[f]) { settings[f] = clean; changed = true; }
+      }
+    });
+    if (changed) await settings.save();
+    res.json({ success: true, cleaned: changed, data: settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
