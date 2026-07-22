@@ -22,6 +22,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     app: 'Blossom by Vartika - Luxury Studio API',
+    version: 'v2-dynamic-customizer-fixed',
     timestamp: new Date().toISOString()
   });
 });

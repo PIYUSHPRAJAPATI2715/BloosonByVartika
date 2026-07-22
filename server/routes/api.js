@@ -92,45 +92,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// --- DYNAMIC SETTINGS & HOMEPAGE BUILDER ---
-router.get('/settings', async (req, res) => {
-  try {
-    let settings = await Settings.findOne();
-    if (!settings) {
-      settings = await Settings.create({});
-    }
-    res.json({ success: true, data: settings });
-  } catch (err) {
-    res.json({
-      success: true,
-      data: {
-        announcementText: "Jaipur Studio Open for Luxury Bridal Trousseau & Festival Bookings",
-        heroHeading: "Every Gift Tells a Story",
-        heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration.",
-        tagline: "Luxury Trousseau Packaging | Premium Gift Hampers",
-        giftBoxImage: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
-        giftBoxTitle: "Tap to Unwrap Luxury",
-        giftBoxSubtitle: "Handcrafted Bridal Trousseau Box Set",
-        boutiquePhone: "+91 98290 00000",
-        boutiqueAddress: "Plot 45, Malviya Nagar Luxury Corridor, Jaipur, Rajasthan 302017"
-      }
-    });
-  }
-});
 
-router.put('/settings', async (req, res) => {
-  try {
-    let settings = await Settings.findOne();
-    if (!settings) {
-      settings = await Settings.create(req.body);
-    } else {
-      settings = await Settings.findByIdAndUpdate(settings._id, req.body, { new: true });
-    }
-    res.json({ success: true, data: settings });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-});
 
 // --- PRODUCTS ---
 router.get('/products', async (req, res) => {
