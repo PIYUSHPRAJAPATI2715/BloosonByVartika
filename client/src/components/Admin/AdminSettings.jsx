@@ -34,37 +34,47 @@ export default function AdminSettings({ onSettingsUpdated }) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
       reader.onload = (event) => {
+        const rawBase64 = event.target.result;
+        
+        // Try to compress
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const maxDim = 800;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxDim) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
+          try {
+            const canvas = document.createElement('canvas');
+            const maxDim = 800;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+              if (width > maxDim) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              }
+            } else {
+              if (height > maxDim) {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
             }
-          } else {
-            if (height > maxDim) {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.75);
+            
+            setSettings(prev => ({ ...prev, aboutImage: compressed }));
+          } catch (canvasErr) {
+            console.warn("Canvas compression failed, falling back to raw:", canvasErr);
+            setSettings(prev => ({ ...prev, aboutImage: rawBase64 }));
           }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const compressed = canvas.toDataURL('image/jpeg', 0.75);
-          setSettings(prev => ({ ...prev, aboutImage: compressed }));
         };
-        img.src = event.target.result;
+        img.onerror = (imgErr) => {
+          console.warn("Image load failed, falling back to raw:", imgErr);
+          setSettings(prev => ({ ...prev, aboutImage: rawBase64 }));
+        };
+        img.src = rawBase64;
       };
+      reader.readAsDataURL(file);
     }
   };
 
