@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Plus, Eye, EyeOff, Edit, Trash2, Save, X, Image } from 'lucide-react';
+import Pagination from '../Common/Pagination';
 import { getApiUrl } from '../../config/api';
 
 export default function AdminCategories() {
