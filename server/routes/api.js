@@ -125,6 +125,13 @@ router.get('/users', async (req, res) => {
 
 
 // --- PRODUCTS ---
+// Helper: strips Base64 image data from objects to prevent huge payloads
+const stripBase64 = (val) => {
+  if (typeof val === 'string' && val.startsWith('data:')) return null;
+  if (Array.isArray(val)) return val.map(v => stripBase64(v));
+  return val;
+};
+
 router.get('/products', async (req, res) => {
   const { category, featured, search } = req.query;
   let query = {};
@@ -133,7 +140,12 @@ router.get('/products', async (req, res) => {
   if (search) query.name = { $regex: search, $options: 'i' };
 
   try {
-    const products = await Product.find(query).sort({ createdAt: -1 });
+    const raw = await Product.find(query).sort({ createdAt: -1 }).lean();
+    const products = raw.map(p => ({
+      ...p,
+      imageUrl: stripBase64(p.imageUrl),
+      images: stripBase64(p.images),
+    }));
     res.json({ success: true, count: products.length, data: products });
   } catch (err) {
     res.json({ success: true, count: 0, data: [] });
@@ -202,10 +214,16 @@ router.get('/categories', async (req, res) => {
     const totalCount = await Category.countDocuments(filter);
     const totalPages = Math.ceil(totalCount / limit) || 1;
 
-    const categories = await Category.find(filter)
+    const raw = await Category.find(filter)
       .sort({ sortOrder: 1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    const categories = raw.map(c => ({
+      ...c,
+      banner: stripBase64(c.banner),
+    }));
 
     res.json({
       success: true,
@@ -654,6 +672,58 @@ router.get('/settings/clean', async (req, res) => {
     });
     if (changed) await settings.save();
     res.json({ success: true, cleaned: changed, data: settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Permanently remove Base64 images from ALL categories and products in DB
+router.get('/db/clean-images', async (req, res) => {
+  try {
+    const isBase64 = (v) => typeof v === 'string' && v.startsWith('data:');
+
+    // Clean categories
+    const cats = await Category.find({}).lean();
+    let catsCleaned = 0;
+    for (const cat of cats) {
+      if (isBase64(cat.banner)) {
+        await Category.findByIdAndUpdate(cat._id, { banner: null });
+        catsCleaned++;
+      }
+    }
+
+    // Clean products
+    const prods = await Product.find({}).lean();
+    let prodsCleaned = 0;
+    for (const prod of prods) {
+      let update = {};
+      if (isBase64(prod.imageUrl)) update.imageUrl = null;
+      if (Array.isArray(prod.images)) {
+        const cleaned = prod.images.map(img => isBase64(img) ? null : img).filter(Boolean);
+        if (cleaned.length !== prod.images.length) update.images = cleaned;
+      }
+      if (Object.keys(update).length > 0) {
+        await Product.findByIdAndUpdate(prod._id, update);
+        prodsCleaned++;
+      }
+    }
+
+    // Clean settings (aboutImage)
+    const settings = await Setting.findOne();
+    let settingsCleaned = false;
+    if (settings && isBase64(settings.aboutImage)) {
+      settings.aboutImage = null;
+      await settings.save();
+      settingsCleaned = true;
+    }
+
+    res.json({
+      success: true,
+      message: 'DB cleaned successfully',
+      catsCleaned,
+      prodsCleaned,
+      settingsCleaned
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
