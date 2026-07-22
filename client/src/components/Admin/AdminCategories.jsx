@@ -18,6 +18,21 @@ export default function AdminCategories() {
 
   const [editingCategory, setEditingCategory] = useState(null);
 
+  const handleBannerUpload = (e, isEdit = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (isEdit) {
+          setEditingCategory(prev => ({ ...prev, banner: reader.result }));
+        } else {
+          setNewCategory(prev => ({ ...prev, banner: reader.result }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Fetch all categories for admin (including invisible ones)
   const fetchCategories = () => {
     fetch(getApiUrl('/api/categories?admin=true'))
@@ -278,14 +293,48 @@ export default function AdminCategories() {
               </div>
 
               <div>
-                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Banner Image URL</label>
-                <input 
-                  type="text" 
-                  placeholder="https://images.unsplash.com/... or Google Image link" 
-                  value={newCategory.banner} 
-                  onChange={e => setNewCategory({...newCategory, banner: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
-                />
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Banner Image</label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+                  <label 
+                    style={{
+                      flex: 1,
+                      background: 'rgba(200, 164, 93, 0.1)',
+                      border: '1px dashed #C8A45D',
+                      borderRadius: '10px',
+                      padding: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      color: '#C8A45D',
+                      fontWeight: 600,
+                      textAlign: 'center'
+                    }}
+                  >
+                    Upload File
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={e => handleBannerUpload(e, false)} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Or paste image URL..." 
+                    value={newCategory.banner.startsWith('data:') ? 'Local Image File Loaded' : newCategory.banner} 
+                    onChange={e => setNewCategory({...newCategory, banner: e.target.value})} 
+                    style={{ flex: 2, padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.85rem', outline: 'none' }} 
+                  />
+                </div>
+                {newCategory.banner && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#1E1E1E', padding: '8px 12px', borderRadius: '10px', border: '1px solid #333' }}>
+                    <img src={newCategory.banner} alt="Preview" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                    <span style={{ fontSize: '0.75rem', color: '#4CAF50', fontWeight: 600 }}>✓ Banner Loaded</span>
+                    <button type="button" onClick={() => setNewCategory({...newCategory, banner: ''})} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#E57373', fontSize: '0.75rem', cursor: 'pointer' }}>Remove</button>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -355,13 +404,48 @@ export default function AdminCategories() {
               </div>
 
               <div>
-                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Banner Image URL</label>
-                <input 
-                  type="text" 
-                  value={editingCategory.banner || ''} 
-                  onChange={e => setEditingCategory({...editingCategory, banner: e.target.value})} 
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.9rem', outline: 'none' }} 
-                />
+                <label style={{ fontSize: '0.8rem', color: '#C8A45D', display: 'block', marginBottom: '6px' }}>Category Banner Image</label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+                  <label 
+                    style={{
+                      flex: 1,
+                      background: 'rgba(200, 164, 93, 0.1)',
+                      border: '1px dashed #C8A45D',
+                      borderRadius: '10px',
+                      padding: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      color: '#C8A45D',
+                      fontWeight: 600,
+                      textAlign: 'center'
+                    }}
+                  >
+                    Upload File
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={e => handleBannerUpload(e, true)} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Or paste image URL..." 
+                    value={editingCategory.banner && editingCategory.banner.startsWith('data:') ? 'Local Image File Loaded' : editingCategory.banner || ''} 
+                    onChange={e => setEditingCategory({...editingCategory, banner: e.target.value})} 
+                    style={{ flex: 2, padding: '10px 14px', borderRadius: '10px', border: '1px solid #555', background: '#1E1E1E', color: '#FFF', fontSize: '0.85rem', outline: 'none' }} 
+                  />
+                </div>
+                {editingCategory.banner && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#1E1E1E', padding: '8px 12px', borderRadius: '10px', border: '1px solid #333' }}>
+                    <img src={editingCategory.banner} alt="Preview" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                    <span style={{ fontSize: '0.75rem', color: '#4CAF50', fontWeight: 600 }}>✓ Banner Loaded</span>
+                    <button type="button" onClick={() => setEditingCategory({...editingCategory, banner: ''})} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#E57373', fontSize: '0.75rem', cursor: 'pointer' }}>Remove</button>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '16px' }}>

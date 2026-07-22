@@ -30,6 +30,17 @@ export default function AdminSettings({ onSettingsUpdated }) {
   });
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSettings(prev => ({ ...prev, aboutImage: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   useEffect(() => {
     fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
@@ -234,13 +245,48 @@ export default function AdminSettings({ onSettingsUpdated }) {
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Founder Photo URL</label>
-                  <input 
-                    type="text" 
-                    value={settings.aboutImage || ''} 
-                    onChange={e => setSettings({...settings, aboutImage: e.target.value})} 
-                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.88rem', outline: 'none' }} 
-                  />
+                  <label style={{ fontSize: '0.8rem', color: '#AAA', display: 'block', marginBottom: '4px' }}>Founder Photo</label>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
+                    <label 
+                      style={{
+                        flex: 1,
+                        background: 'rgba(200, 164, 93, 0.1)',
+                        border: '1px dashed #C8A45D',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        fontSize: '0.78rem',
+                        color: '#C8A45D',
+                        fontWeight: 600,
+                        textAlign: 'center'
+                      }}
+                    >
+                      Upload File
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageUpload} 
+                        style={{ display: 'none' }} 
+                      />
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="Or paste photo URL..." 
+                      value={settings.aboutImage && settings.aboutImage.startsWith('data:') ? 'Local Image File Loaded' : settings.aboutImage || ''} 
+                      onChange={e => setSettings({...settings, aboutImage: e.target.value})} 
+                      style={{ flex: 2, padding: '10px', borderRadius: '10px', border: '1px solid #555', background: '#282828', color: '#FFF', fontSize: '0.82rem', outline: 'none' }} 
+                    />
+                  </div>
+                  {settings.aboutImage && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#282828', padding: '6px 10px', borderRadius: '8px', border: '1px solid #333' }}>
+                      <img src={settings.aboutImage} alt="Preview" style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }} />
+                      <span style={{ fontSize: '0.72rem', color: '#4CAF50', fontWeight: 600 }}>✓ Image Loaded</span>
+                      <button type="button" onClick={() => setSettings({...settings, aboutImage: ''})} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#E57373', fontSize: '0.72rem', cursor: 'pointer' }}>Remove</button>
+                    </div>
+                  )}
                 </div>
               </div>
 
