@@ -341,14 +341,14 @@ export default function AdminCategories() {
                     }}
                   >
                     Upload File
-                    <input 
-                      id="category-banner-upload-add"
-                      type="file" 
-                      accept="image/*" 
-                      onChange={e => handleBannerUpload(e, false)} 
-                      style={{ display: 'none' }} 
-                    />
                   </label>
+                  <input 
+                    id="category-banner-upload-add"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={e => handleBannerUpload(e, false)} 
+                    style={{ display: 'none' }} 
+                  />
                   <input 
                     type="text" 
                     placeholder="Or paste image URL..." 
@@ -454,14 +454,14 @@ export default function AdminCategories() {
                     }}
                   >
                     Upload File
-                    <input 
-                      id="category-banner-upload-edit"
-                      type="file" 
-                      accept="image/*" 
-                      onChange={e => handleBannerUpload(e, true)} 
-                      style={{ display: 'none' }} 
-                    />
                   </label>
+                  <input 
+                    id="category-banner-upload-edit"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={e => handleBannerUpload(e, true)} 
+                    style={{ display: 'none' }} 
+                  />
                   <input 
                     type="text" 
                     placeholder="Or paste image URL..." 

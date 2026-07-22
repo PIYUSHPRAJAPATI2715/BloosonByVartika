@@ -293,14 +293,14 @@ export default function AdminSettings({ onSettingsUpdated }) {
                       }}
                     >
                       Upload File
-                      <input 
-                        id="founder-photo-upload-input"
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleImageUpload} 
-                        style={{ display: 'none' }} 
-                      />
                     </label>
+                    <input 
+                      id="founder-photo-upload-input"
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageUpload} 
+                      style={{ display: 'none' }} 
+                    />
                     <input 
                       type="text" 
                       placeholder="Or paste photo URL..." 
