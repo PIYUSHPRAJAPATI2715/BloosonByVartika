@@ -6,7 +6,6 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
 
   const menuItems = [
     { id: 'dashboard', label: 'Executive Dashboard', icon: <LayoutDashboard size={18} /> },
-    { id: 'custom-orders', label: 'Custom Requests', icon: <Gift size={18} />, badge: 'New' },
     { id: 'orders', label: 'Order Management', icon: <ShoppingBag size={18} /> },
     { id: 'users', label: 'Registered Clients', icon: <Users size={18} /> },
     { id: 'products', label: 'Product Catalog & Stock', icon: <Box size={18} /> },

@@ -6,17 +6,27 @@ export default function AdminSettings({ onSettingsUpdated }) {
   const [settings, setSettings] = useState({
     announcementText: "👑 JAIPUR STUDIO OPEN FOR LUXURY BRIDAL TROUSSEAU & FESTIVAL BOOKINGS",
     heroHeading: "Every Gift Tells a Story",
-    heroSubheading: "Luxury Handmade Hampers crafted with love for every celebration.",
-    tagline: "Luxury Trousseau Packaging | Premium Gift Hampers",
-    giftBoxImage: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=800",
-    giftBoxTitle: "Tap to Unwrap Luxury",
-    giftBoxSubtitle: "Handcrafted Bridal Trousseau Box Set",
+    heroSubheading: "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur.",
     address: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
     contactPhone: "+91 98280 23641",
     contactEmail: "vartika1594@gmail.com",
     boutiqueAddress: "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021",
     boutiquePhone: "+91 98280 23641",
-    boutiqueEmail: "vartika1594@gmail.com"
+    boutiqueEmail: "vartika1594@gmail.com",
+    aboutTitle: "Founder Vartika Gupta",
+    aboutHeading: "Meet Founder Vartika Gupta",
+    aboutDescription: "Born in the vibrant Pink City of Jaipur, Vartika founded Blossom by Vartika with a single mission: to transform standard gifting into emotional, unforgettable works of art.",
+    aboutImage: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+    aboutBadgeText: "10,000+ Gifts Packed",
+    aboutBadgeSub: "Trusted by Brides & Planners",
+    aboutValuesTitle: "Why Blossom Gifts Are Treasured Forever",
+    aboutValuesDesc: "Unlike mass-manufactured boxes, every gift created at our Jaipur studio carries individual character. We combine royal Rajasthani heritage motifs with modern minimalist French aesthetics.",
+    aboutValue1Title: "Custom Theme Matching",
+    aboutValue1Desc: "Color-coordinated to match your wedding outfit or event decor.",
+    aboutValue2Title: "Monogram Personalization",
+    aboutValue2Desc: "Custom foil printing with initials, dates, and handwritten scrolls.",
+    aboutValue3Title: "Eco-Conscious Keepsakes",
+    aboutValue3Desc: "Reusable trunks and rigid boxes built to last a lifetime."
   });
   const [savedSuccess, setSavedSuccess] = useState(false);
 

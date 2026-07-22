@@ -21,7 +21,6 @@ import { getApiUrl } from './config/api';
 // Admin imports
 import AdminLayout from './components/Admin/AdminLayout';
 import AdminDashboard from './components/Admin/AdminDashboard';
-import AdminCustomOrders from './components/Admin/AdminCustomOrders';
 import AdminOrders from './components/Admin/AdminOrders';
 import AdminUsers from './components/Admin/AdminUsers';
 import AdminProducts from './components/Admin/AdminProducts';
@@ -331,7 +330,6 @@ export default function App() {
           onExitAdmin={() => setActiveAdmin(false)}
         >
           {adminTab === 'dashboard' && <AdminDashboard onNavigate={setAdminTab} />}
-          {adminTab === 'custom-orders' && <AdminCustomOrders />}
           {adminTab === 'orders' && <AdminOrders />}
           {adminTab === 'users' && <AdminUsers />}
           {adminTab === 'products' && <AdminProducts />}
