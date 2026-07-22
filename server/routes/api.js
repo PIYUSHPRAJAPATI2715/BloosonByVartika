@@ -540,7 +540,21 @@ router.get('/settings', async (req, res) => {
         aboutValue3Desc: "Reusable trunks and rigid boxes built to last a lifetime."
       });
     }
+    // Sanitize: strip any accidental "(Updated via API)" or "(UPDATED)" suffixes
+    const sanitize = (val) => typeof val === 'string'
+      ? val.replace(/\(Updated via API\)/gi, '').replace(/\(UPDATED\)/gi, '').replace(/[•\-]$/, '').trim()
+      : val;
+    const sanitizedFields = ['announcementText','heroHeading','heroSubheading','aboutTitle','aboutHeading','aboutDescription'];
+    let needsSave = false;
+    sanitizedFields.forEach(f => {
+      if (settings[f] && settings[f] !== sanitize(settings[f])) {
+        settings[f] = sanitize(settings[f]);
+        needsSave = true;
+      }
+    });
+    if (needsSave) await settings.save();
     res.json({ success: true, data: settings });
+
   } catch (err) {
     res.json({
       success: true,
