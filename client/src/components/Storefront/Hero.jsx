@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Gift, Heart, ChevronRight, ArrowUpRight } from 'lucide-react';
 
-export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder, onOpenQuiz }) {
+export default function Hero({ settings }) {
   const [boxOpened, setBoxOpened] = useState(false);
 
   return (
@@ -72,10 +72,23 @@ export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder,
               marginBottom: '20px'
             }}
           >
-            Every Gift <br />
-            <span className="title-blush-gradient" style={{ fontStyle: 'italic', fontWeight: 400 }}>
-              Tells a Story
-            </span>
+            {settings?.heroHeading ? (
+              settings.heroHeading.includes('Story') ? (
+                <>
+                  {settings.heroHeading.replace('Story', '')}
+                  <span className="title-blush-gradient" style={{ fontStyle: 'italic', fontWeight: 400 }}>
+                    Story
+                  </span>
+                </>
+              ) : settings.heroHeading
+            ) : (
+              <>
+                Every Gift <br />
+                <span className="title-blush-gradient" style={{ fontStyle: 'italic', fontWeight: 400 }}>
+                  Tells a Story
+                </span>
+              </>
+            )}
           </h1>
 
           <p 
@@ -87,7 +100,7 @@ export default function Hero({ settings, onOpenCustomOrder, onOpenHamperBuilder,
               lineHeight: 1.7
             }}
           >
-            Handcrafted premium gifts, customized resin keychains, wedding items, and personalized birthday greeting packs. Designed with elegance in Jaipur to create unforgettable memories.
+            {settings?.heroSubheading || "Luxury Handmade Hampers & Trousseau Packaging crafted with love in Jaipur."}
           </p>
 
           {/* CTA Buttons */}

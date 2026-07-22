@@ -350,6 +350,7 @@ export default function App() {
             onOpenAuthModal={(m) => { setAuthModalMode(m); setAuthModalOpen(true); }}
             onLogout={handleLogout}
             onTriggerAdminAuth={() => { setAuthModalMode('admin'); setAuthModalOpen(true); }}
+            websiteSettings={websiteSettings}
           />
 
           <Hero 

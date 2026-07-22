@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Eye, ShoppingBag, Heart, Filter, Check } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
 
 export default function ProductGallery({ products, selectedCategory, onSelectCategory, onQuickView, onAddToCart, onOpenHamperBuilder, onOpenAllProducts }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -8,10 +9,7 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
   const [categories, setCategories] = useState(['All']);
 
   useEffect(() => {
-    const fetchUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-      ? 'http://localhost:5000/api/categories'
-      : 'https://bloosombyvartika.onrender.com/api/categories';
-    fetch(fetchUrl)
+    fetch(getApiUrl('/api/categories'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.length > 0) {

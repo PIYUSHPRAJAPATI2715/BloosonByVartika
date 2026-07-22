@@ -4,16 +4,13 @@ import { ShoppingBag, Sparkles, Truck, User, LogOut, Lock, Gift, Compass, Menu, 
 export default function Navbar({ 
   cartCount, 
   onOpenCart, 
-  onOpenCustomOrder, 
-  onOpenHamperBuilder, 
-  onOpenQuiz, 
-  onOpenPlanner,
   onOpenOrderTracker,
   onOpenAllProducts,
   currentUser,
   onOpenAuthModal,
   onLogout,
-  onTriggerAdminAuth
+  onTriggerAdminAuth,
+  websiteSettings
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,7 +58,7 @@ export default function Navbar({
           }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Sparkles size={12} color="#1E1E1E" /> 👑 Jaipur Studio Open for Luxury Bookings
+            <Sparkles size={12} color="#1E1E1E" /> {websiteSettings?.announcementText || "👑 JAIPUR STUDIO OPEN FOR LUXURY BOOKINGS"}
           </span>
           <span style={{ opacity: 0.5 }}>•</span>
           <span 
