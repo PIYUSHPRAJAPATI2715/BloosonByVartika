@@ -54,9 +54,41 @@ export default function Footer({ websiteSettings }) {
           {/* Contact Details */}
           <div>
             <h4 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.1rem', marginBottom: '16px' }}>Jaipur Studio</h4>
-            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📍 {address}</p>
-            <p style={{ color: '#CCC', fontSize: '0.85rem', marginBottom: '8px' }}>📞 {phone}</p>
-            <p style={{ color: '#CCC', fontSize: '0.85rem' }}>✉️ {email}</p>
+            <p style={{ marginBottom: '10px', fontSize: '0.85rem', lineHeight: 1.4 }}>
+              <a 
+                href={`https://maps.google.com/?q=${encodeURIComponent(address)}`} 
+                target="_blank" 
+                rel="noreferrer" 
+                style={{ color: '#CCC', textDecoration: 'none', transition: 'color 0.2s', display: 'flex', gap: '6px', alignItems: 'flex-start' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#F4E8C1'}
+                onMouseLeave={e => e.currentTarget.style.color = '#CCC'}
+              >
+                <span>📍</span>
+                <span>{address}</span>
+              </a>
+            </p>
+            <p style={{ marginBottom: '10px', fontSize: '0.85rem' }}>
+              <a 
+                href={`tel:${phone}`} 
+                style={{ color: '#CCC', textDecoration: 'none', transition: 'color 0.2s', display: 'flex', gap: '6px', alignItems: 'center' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#F4E8C1'}
+                onMouseLeave={e => e.currentTarget.style.color = '#CCC'}
+              >
+                <span>📞</span>
+                <span>{phone}</span>
+              </a>
+            </p>
+            <p style={{ fontSize: '0.85rem' }}>
+              <a 
+                href={`mailto:${email}`} 
+                style={{ color: '#CCC', textDecoration: 'none', transition: 'color 0.2s', display: 'flex', gap: '6px', alignItems: 'center' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#F4E8C1'}
+                onMouseLeave={e => e.currentTarget.style.color = '#CCC'}
+              >
+                <span>✉️</span>
+                <span>{email}</span>
+              </a>
+            </p>
           </div>
 
         </div>
