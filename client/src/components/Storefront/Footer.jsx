@@ -39,18 +39,6 @@ export default function Footer({ websiteSettings }) {
             </ul>
           </div>
 
-          {/* Business Services */}
-          <div>
-            <h4 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.1rem', marginBottom: '16px' }}>Boutique Specialties</h4>
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.88rem', color: '#CCC' }}>
-              <li>Bridal & Groom Trousseau Packing</li>
-              <li>Mirror & Zari Shagun Trays</li>
-              <li>Baby Announcement Chests</li>
-              <li>Gold Embossed Diwali Trunks</li>
-              <li>Corporate VIP Branding Gifts</li>
-            </ul>
-          </div>
-
           {/* Contact Details */}
           <div>
             <h4 style={{ fontFamily: 'var(--font-serif)', color: '#F4E8C1', fontSize: '1.1rem', marginBottom: '16px' }}>Jaipur Studio</h4>
