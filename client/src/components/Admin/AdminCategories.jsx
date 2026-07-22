@@ -22,57 +22,12 @@ export default function AdminCategories() {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const rawBase64 = event.target.result;
-        
-        // Try to compress
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            const maxDim = 800;
-            let width = img.width;
-            let height = img.height;
-            if (width > height) {
-              if (width > maxDim) {
-                height = Math.round((height * maxDim) / width);
-                width = maxDim;
-              }
-            } else {
-              if (height > maxDim) {
-                width = Math.round((width * maxDim) / height);
-                height = maxDim;
-              }
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.7);
-            
-            if (isEdit) {
-              setEditingCategory(prev => ({ ...prev, banner: compressed }));
-            } else {
-              setNewCategory(prev => ({ ...prev, banner: compressed }));
-            }
-          } catch (canvasErr) {
-            console.warn("Canvas compression failed, falling back to raw:", canvasErr);
-            if (isEdit) {
-              setEditingCategory(prev => ({ ...prev, banner: rawBase64 }));
-            } else {
-              setNewCategory(prev => ({ ...prev, banner: rawBase64 }));
-            }
-          }
-        };
-        img.onerror = (imgErr) => {
-          console.warn("Image load failed, falling back to raw:", imgErr);
-          if (isEdit) {
-            setEditingCategory(prev => ({ ...prev, banner: rawBase64 }));
-          } else {
-            setNewCategory(prev => ({ ...prev, banner: rawBase64 }));
-          }
-        };
-        img.src = rawBase64;
+      reader.onloadend = () => {
+        if (isEdit) {
+          setEditingCategory(prev => ({ ...prev, banner: reader.result }));
+        } else {
+          setNewCategory(prev => ({ ...prev, banner: reader.result }));
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -108,14 +63,15 @@ export default function AdminCategories() {
       const data = await res.json();
       if (data.success && data.data) {
         setCategories([...categories, data.data]);
+        setShowAddModal(false);
+        setNewCategory({ name: '', slug: '', description: '', banner: '', sortOrder: categories.length + 1, isVisible: true });
       } else {
-        fetchCategories();
+        alert("Failed to create category: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      fetchCategories();
+      console.error(err);
+      alert("Failed to create category due to a network or server error.");
     }
-    setShowAddModal(false);
-    setNewCategory({ name: '', slug: '', description: '', banner: '', sortOrder: categories.length + 1, isVisible: true });
   };
 
   const handleUpdate = async (e) => {
@@ -132,14 +88,15 @@ export default function AdminCategories() {
       const data = await res.json();
       if (data.success && data.data) {
         setCategories(categories.map(c => c._id === editingCategory._id ? data.data : c));
+        setShowEditModal(false);
+        setEditingCategory(null);
       } else {
-        fetchCategories();
+        alert("Failed to update category: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      fetchCategories();
+      console.error(err);
+      alert("Failed to update category due to a network or server error. The image file might be too large for the hosting server. Try a smaller file.");
     }
-    setShowEditModal(false);
-    setEditingCategory(null);
   };
 
   const handleDelete = async (id) => {

@@ -14,15 +14,15 @@ connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Health Check
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     app: 'Blossom by Vartika - Luxury Studio API',
-    version: 'v3-categories-crud-image-uploads',
+    version: 'v4-raw-large-uploads-supported',
     timestamp: new Date().toISOString()
   });
 });

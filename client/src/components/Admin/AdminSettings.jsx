@@ -34,45 +34,8 @@ export default function AdminSettings({ onSettingsUpdated }) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const rawBase64 = event.target.result;
-        
-        // Try to compress
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            const maxDim = 800;
-            let width = img.width;
-            let height = img.height;
-            if (width > height) {
-              if (width > maxDim) {
-                height = Math.round((height * maxDim) / width);
-                width = maxDim;
-              }
-            } else {
-              if (height > maxDim) {
-                width = Math.round((width * maxDim) / height);
-                height = maxDim;
-              }
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/jpeg', 0.75);
-            
-            setSettings(prev => ({ ...prev, aboutImage: compressed }));
-          } catch (canvasErr) {
-            console.warn("Canvas compression failed, falling back to raw:", canvasErr);
-            setSettings(prev => ({ ...prev, aboutImage: rawBase64 }));
-          }
-        };
-        img.onerror = (imgErr) => {
-          console.warn("Image load failed, falling back to raw:", imgErr);
-          setSettings(prev => ({ ...prev, aboutImage: rawBase64 }));
-        };
-        img.src = rawBase64;
+      reader.onloadend = () => {
+        setSettings(prev => ({ ...prev, aboutImage: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -117,12 +80,15 @@ export default function AdminSettings({ onSettingsUpdated }) {
       if (data.success && data.data) {
         setSettings(prev => ({ ...prev, ...data.data }));
         if (onSettingsUpdated) onSettingsUpdated(data.data);
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 2500);
+      } else {
+        alert("Failed to save settings: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      console.warn("Settings save fallback:", err);
+      console.error(err);
+      alert("Failed to save settings due to a network or server error. The image file might be too large for the hosting server. Try a smaller file.");
     }
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
   };
 
   return (
