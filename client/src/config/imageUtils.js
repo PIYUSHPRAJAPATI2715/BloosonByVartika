@@ -4,10 +4,13 @@ export function getProductImages(product) {
   if (!product) return [DEFAULT_PRODUCT_IMAGE];
   let imgs = [];
   if (Array.isArray(product.images)) {
-    imgs = product.images.filter(img => typeof img === 'string' && img.trim().length > 0 && !img.startsWith('data:'));
+    imgs = product.images.filter(img => typeof img === 'string' && img.trim().length > 0);
   }
-  if (imgs.length === 0 && typeof product.imageUrl === 'string' && product.imageUrl.trim().length > 0 && !product.imageUrl.startsWith('data:')) {
+  if (imgs.length === 0 && typeof product.imageUrl === 'string' && product.imageUrl.trim().length > 0) {
     imgs.push(product.imageUrl);
+  }
+  if (imgs.length === 0 && typeof product.image === 'string' && product.image.trim().length > 0) {
+    imgs.push(product.image);
   }
   if (imgs.length === 0) {
     imgs.push(DEFAULT_PRODUCT_IMAGE);
