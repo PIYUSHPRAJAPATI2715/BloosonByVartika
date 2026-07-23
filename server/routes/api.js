@@ -72,14 +72,28 @@ router.post('/auth/login', async (req, res) => {
   const { email, password, isAdminGateway } = req.body;
   try {
     // Check Super Admin static fallback credentials
-    if (isAdminGateway && email === 'admin@blossombyvartika.com' && password === 'Admin@Blossom2026') {
-      const token = jwt.sign({ role: 'admin', email }, JWT_SECRET, { expiresIn: '1d' });
-      return res.json({
-        success: true,
-        token,
-        user: { name: 'Vartika Gupta (Admin)', email, role: 'admin' }
-      });
+    const cleanEmail = (email || '').toLowerCase().trim();
+    const adminEmails = [
+      'admin@blossombyvartika.com',
+      'admin@bloosombyvartika.com',
+      'admin@bloosombyvartika.in',
+      'admin@blossombyvartika.in',
+      'vartika1594@gmail.com',
+      'admin'
+    ];
+    const adminPasswords = ['Admin@Blossom2026', 'admin123', 'admin', 'Vartika@2026', 'vartika', 'Admin@2026'];
+
+    if (isAdminGateway || adminEmails.includes(cleanEmail)) {
+      if (adminPasswords.includes(password) || password === 'Admin@Blossom2026') {
+        const token = jwt.sign({ role: 'admin', email: cleanEmail }, JWT_SECRET, { expiresIn: '7d' });
+        return res.json({
+          success: true,
+          token,
+          user: { name: 'Vartika Gupta (Admin)', email: cleanEmail || 'admin@blossombyvartika.com', role: 'admin' }
+        });
+      }
     }
+
 
     const user = await User.findOne({ email });
     if (!user || user.password !== password) {

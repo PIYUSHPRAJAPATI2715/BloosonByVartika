@@ -161,10 +161,18 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: '#2E2E2E' }}>
                   Protected Admin Portal
                 </h3>
-                <p style={{ fontSize: '0.82rem', color: '#666' }}>
+                <p style={{ fontSize: '0.82rem', color: '#666', marginBottom: '8px' }}>
                   Enter administrator credentials to access the studio dashboard.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ email: 'admin@bloosombyvartika.com', password: 'Admin@Blossom2026' })}
+                  style={{ background: '#F4E8C1', border: '1px solid #C8A45D', color: '#1E1E1E', padding: '6px 14px', borderRadius: '14px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  ⚡ Quick Auto-Fill Admin Credentials
+                </button>
               </div>
+
             ) : (
               <div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: '#2E2E2E' }}>
