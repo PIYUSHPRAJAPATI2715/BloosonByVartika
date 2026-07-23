@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Eye, ShoppingBag, Heart, Filter, Check } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
+import { getProductMainImage } from '../../config/imageUtils';
 
 export default function ProductGallery({ products, selectedCategory, onSelectCategory, onQuickView, onAddToCart, onOpenHamperBuilder, onOpenAllProducts }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,12 +25,16 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
       });
   }, []);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = (products || []).filter(product => {
+    if (!product) return false;
+    const nameStr = product.name || '';
+    const search = (searchQuery || '').toLowerCase();
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (product.tags && product.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
+    const matchesSearch = nameStr.toLowerCase().includes(search) || 
+                          (Array.isArray(product.tags) && product.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(search)));
     return matchesCategory && matchesSearch;
   });
+
 
   const toggleFavorite = (id) => {
     if (favorites.includes(id)) {
@@ -156,8 +161,8 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
                 {/* Product Image & Badges */}
                 <div style={{ position: 'relative', height: '280px', overflow: 'hidden' }}>
                   <img 
-                    src={product.images[0]} 
-                    alt={product.name}
+                    src={getProductMainImage(product)} 
+                    alt={product.name || 'Luxury Product'}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -165,6 +170,7 @@ export default function ProductGallery({ products, selectedCategory, onSelectCat
                       transition: 'transform 0.5s ease'
                     }}
                   />
+
 
                   {/* Ribbon Badge */}
                   {product.isFeatured && (

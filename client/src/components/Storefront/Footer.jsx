@@ -2,9 +2,10 @@ import React from 'react';
 import { Heart, Instagram, Facebook, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function Footer({ websiteSettings }) {
-  const address = websiteSettings?.address || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
-  const phone = websiteSettings?.contactPhone || "+91 98280 23641";
-  const email = websiteSettings?.contactEmail || "vartika1594@gmail.com";
+  const address = (websiteSettings && (websiteSettings.address || websiteSettings.boutiqueAddress)) || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
+  const phone = (websiteSettings && (websiteSettings.contactPhone || websiteSettings.boutiquePhone)) || "+91 98280 23641";
+  const email = (websiteSettings && (websiteSettings.contactEmail || websiteSettings.boutiqueEmail)) || "vartika1594@gmail.com";
+
 
   return (
     <footer style={{ background: '#2E2E2E', color: '#FFFFFF', paddingTop: '70px', paddingBottom: '30px', borderTop: '3px solid #C8A45D' }}>

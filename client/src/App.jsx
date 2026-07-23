@@ -195,8 +195,15 @@ export default function App() {
     fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data) {
-          setWebsiteSettings(prev => ({ ...prev, ...data.data }));
+        if (data.success && data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+          const s = data.data;
+          setWebsiteSettings(prev => {
+            const merged = { ...prev, ...s };
+            merged.contactPhone = s.contactPhone || s.boutiquePhone || prev.contactPhone || "+91 98280 23641";
+            merged.contactEmail = s.contactEmail || s.boutiqueEmail || prev.contactEmail || "vartika1594@gmail.com";
+            merged.address = s.address || s.boutiqueAddress || prev.address || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
+            return merged;
+          });
         }
       })
       .catch(err => console.warn("Failed to load settings:", err));
@@ -236,22 +243,19 @@ export default function App() {
     }
   }, [activeAdmin, isAllProductsOpen]);
 
-  // Fetch products & website settings from REST API on mount
+  // Fetch products from REST API on mount
   useEffect(() => {
     fetch(getApiUrl('/api/products'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) setProducts(data.data);
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const validProducts = data.data.filter(p => p && typeof p === 'object');
+          if (validProducts.length > 0) setProducts(validProducts);
+        }
       })
       .catch(err => console.warn("API products fallback:", err));
-
-    fetch(getApiUrl('/api/settings'))
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.data) setWebsiteSettings(data.data);
-      })
-      .catch(err => console.warn("API settings fallback:", err));
   }, []);
+
 
   const handleAuthSuccess = (user, token, isAdmin = false) => {
     setCurrentUser(user);

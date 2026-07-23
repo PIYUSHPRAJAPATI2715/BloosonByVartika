@@ -12,9 +12,9 @@ export default function ContactSection({ websiteSettings }) {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const address = websiteSettings?.address || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
-  const phone = websiteSettings?.contactPhone || "+91 98280 23641";
-  const email = websiteSettings?.contactEmail || "vartika1594@gmail.com";
+  const address = (websiteSettings && (websiteSettings.address || websiteSettings.boutiqueAddress)) || "Shop No G3, Ganesham 2, Nursery Cir, Indraprastha Colony, B Block, Vaishali Nagar, Jaipur, Rajasthan 302021";
+  const phone = (websiteSettings && (websiteSettings.contactPhone || websiteSettings.boutiquePhone)) || "+91 98280 23641";
+  const email = (websiteSettings && (websiteSettings.contactEmail || websiteSettings.boutiqueEmail)) || "vartika1594@gmail.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,11 +31,13 @@ export default function ContactSection({ websiteSettings }) {
   };
 
   const openWhatsApp = () => {
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
-    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+    const rawPhone = String(phone || '9828023641');
+    const cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : (cleanPhone || '919828023641');
     const text = encodeURIComponent("Hello Vartika! I would like to inquire about luxury wedding trousseau packaging / gift hampers.");
     window.open(`https://wa.me/${targetPhone}?text=${text}`, '_blank');
   };
+
 
   return (
     <section id="contact" style={{ padding: '90px 24px', background: '#FFFFFF' }}>

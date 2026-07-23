@@ -1,37 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight, Plus, Send, CheckCircle2 } from 'lucide-react';
+import { getApiUrl } from '../../config/api';
+
+const DEFAULT_REVIEWS = [
+  {
+    _id: '1',
+    customerName: "Priyanka Ranawat",
+    location: "Jaipur, Rajasthan",
+    occasion: "Bridal Trousseau Box Set",
+    rating: 5,
+    reviewText: "Vartika and her team at Blossom made my wedding trousseau look like a royal museum exhibit! Every box was detailed with zardosi lace, personalized initials, and fresh fragrance.",
+    photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300"
+  },
+  {
+    _id: '2',
+    customerName: "Siddharth & Meera",
+    location: "Delhi NCR",
+    occasion: "Mehendi Favors & Shagun Trays",
+    rating: 5,
+    reviewText: "We ordered 80 Mehendi hampers from Jaipur to Delhi. Not a single petal was displaced during transit. Absolutely magnificent quality, ribbon work, and prompt communication!",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300"
+  },
+  {
+    _id: '3',
+    customerName: "Ananya Singhania",
+    location: "Mumbai",
+    occasion: "Executive Diwali Corporate Hampers",
+    rating: 5,
+    reviewText: "Our VIP clients were blown away by the gold embossed leatherette trunks and solid brass diyas. Vartika Gupta is truly the finest gifting studio founder in Rajasthan.",
+    photoUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300"
+  }
+];
 
 export default function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [reviews, setReviews] = useState([
-    {
-      _id: '1',
-      customerName: "Priyanka Ranawat",
-      location: "Jaipur, Rajasthan",
-      occasion: "Bridal Trousseau Box Set",
-      rating: 5,
-      reviewText: "Vartika and her team at Blossom made my wedding trousseau look like a royal museum exhibit! Every box was detailed with zardosi lace, personalized initials, and fresh fragrance.",
-      photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300"
-    },
-    {
-      _id: '2',
-      customerName: "Siddharth & Meera",
-      location: "Delhi NCR",
-      occasion: "Mehendi Favors & Shagun Trays",
-      rating: 5,
-      reviewText: "We ordered 80 Mehendi hampers from Jaipur to Delhi. Not a single petal was displaced during transit. Absolutely magnificent quality, ribbon work, and prompt communication!",
-      photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300"
-    },
-    {
-      _id: '3',
-      customerName: "Ananya Singhania",
-      location: "Mumbai",
-      occasion: "Executive Diwali Corporate Hampers",
-      rating: 5,
-      reviewText: "Our VIP clients were blown away by the gold embossed leatherette trunks and solid brass diyas. Vartika Gupta is truly the finest gifting studio founder in Rajasthan.",
-      photoUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300"
-    }
-  ]);
+  const [reviews, setReviews] = useState(DEFAULT_REVIEWS);
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [newReview, setNewReview] = useState({
@@ -45,32 +48,33 @@ export default function Testimonials() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
-    fetch('/api/reviews')
+    fetch(getApiUrl('/api/reviews'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           setReviews(data.data);
         }
       })
       .catch(err => console.warn("Reviews API fallback:", err));
   }, []);
 
-  const nextReview = () => setActiveIndex((activeIndex + 1) % reviews.length);
-  const prevReview = () => setActiveIndex((activeIndex - 1 + reviews.length) % reviews.length);
+  const safeReviews = (reviews && reviews.length > 0) ? reviews : DEFAULT_REVIEWS;
+  const nextReview = () => setActiveIndex((activeIndex + 1) % safeReviews.length);
+  const prevReview = () => setActiveIndex((activeIndex - 1 + safeReviews.length) % safeReviews.length);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(getApiUrl('/api/reviews'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newReview)
       });
       const data = await res.json();
       if (data.success && data.data) {
-        setReviews([data.data, ...reviews]);
+        setReviews([data.data, ...safeReviews]);
       } else {
-        setReviews([{ ...newReview, _id: Date.now().toString() }, ...reviews]);
+        setReviews([{ ...newReview, _id: Date.now().toString() }, ...safeReviews]);
       }
       setSubmitSuccess(true);
       setTimeout(() => {
@@ -78,12 +82,13 @@ export default function Testimonials() {
         setSubmitSuccess(false);
       }, 1500);
     } catch (err) {
-      setReviews([{ ...newReview, _id: Date.now().toString() }, ...reviews]);
+      setReviews([{ ...newReview, _id: Date.now().toString() }, ...safeReviews]);
       setShowReviewModal(false);
     }
   };
 
-  const active = reviews[activeIndex] || reviews[0];
+  const active = safeReviews[activeIndex % safeReviews.length] || DEFAULT_REVIEWS[0];
+
 
   return (
     <section style={{ padding: '90px 24px', background: 'linear-gradient(135deg, #FFF9F6 0%, #F8E3EC 100%)', position: 'relative' }}>
