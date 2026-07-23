@@ -25,9 +25,17 @@ class ErrorBoundary extends React.Component {
           <h2 style={{ fontFamily: 'var(--font-serif, serif)', color: '#2E2E2E', fontSize: '1.8rem', marginBottom: '8px' }}>
             Blossom by Vartika
           </h2>
-          <p style={{ color: '#666', maxWidth: '460px', fontSize: '0.9rem', marginBottom: '24px', lineHeight: 1.6 }}>
-            Welcome to Blossom by Vartika. Please click below to refresh the storefront.
+          <p style={{ color: '#666', maxWidth: '460px', fontSize: '0.9rem', marginBottom: '16px', lineHeight: 1.6 }}>
+            A rendering update occurred in the storefront components.
           </p>
+          {this.state.error && (
+            <div style={{ background: '#FFF0F0', border: '1px solid #FFC0C0', padding: '14px 20px', borderRadius: '12px', marginBottom: '20px', maxWidth: '600px', width: '100%', textAlign: 'left', overflowX: 'auto' }}>
+              <strong style={{ color: '#D32F2F', fontSize: '0.85rem' }}>Debug Trace:</strong>
+              <pre style={{ color: '#B71C1C', fontSize: '0.78rem', margin: '6px 0 0 0', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                {this.state.error.stack || this.state.error.message || String(this.state.error)}
+              </pre>
+            </div>
+          )}
           <button 
             onClick={() => {
               this.setState({ hasError: false, error: null });

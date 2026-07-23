@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, Search, SlidersHorizontal, Sparkles, Eye, ShoppingBag, Heart, ArrowLeft, Star, Grid } from 'lucide-react';
+import { getProductMainImage } from '../../config/imageUtils';
 
 export default function AllProductsModal({ isOpen, onClose, products, onQuickView, onAddToCart, onOpenHamperBuilder }) {
+
   if (!isOpen) return null;
 
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -21,13 +23,17 @@ export default function AllProductsModal({ isOpen, onClose, products, onQuickVie
   ];
 
   // Filtering & Sorting logic
-  let filtered = products.filter(p => {
+  let filtered = (products || []).filter(p => {
+    if (!p) return false;
+    const nameStr = String(p.name || '');
+    const search = String(searchQuery || '').toLowerCase();
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (p.tags && p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
-    const matchesPrice = (p.discountPrice || p.price) <= maxPrice;
+    const matchesSearch = nameStr.toLowerCase().includes(search) || 
+                          (Array.isArray(p.tags) && p.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(search)));
+    const matchesPrice = (p.discountPrice || p.price || 0) <= maxPrice;
     return matchesCategory && matchesSearch && matchesPrice;
   });
+
 
   if (sortBy === 'price-low') {
     filtered.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
@@ -228,15 +234,17 @@ export default function AllProductsModal({ isOpen, onClose, products, onQuickVie
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  transition: 'transform 0.3s ease'
                 }}
               >
                 <div style={{ position: 'relative', height: '260px', overflow: 'hidden' }}>
+
                   <img 
-                    src={product.images[0]} 
-                    alt={product.name} 
+                    src={getProductMainImage(product)} 
+                    alt={product.name || 'Luxury Product'} 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
+
+
 
                   {product.isFeatured && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: '#C8A45D', color: '#FFF', padding: '4px 10px', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 700 }}>

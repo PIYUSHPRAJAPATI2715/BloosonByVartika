@@ -12,10 +12,15 @@ export default function ServicesGrid({ onSelectCategory }) {
     fetch(getApiUrl('/api/categories'))
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.data && data.data.length > 0) {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           const sorted = [...data.data].sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99));
+
           const mapped = sorted.map(cat => {
-            const nameLower = cat.name.toLowerCase();
+            const catName = String(cat?.name || '');
+            const nameLower = catName.toLowerCase();
+
+
+
             let icon = <Gift size={28} color="#C8A45D" />;
             let badge = 'Collection';
 

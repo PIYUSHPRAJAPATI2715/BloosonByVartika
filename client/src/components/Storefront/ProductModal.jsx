@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { X, Star, ShoppingBag, ShieldCheck, Truck, Sparkles, Heart, Plus, Minus } from 'lucide-react';
+import { getProductImages } from '../../config/imageUtils';
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   if (!product) return null;
+
+  const images = getProductImages(product);
 
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants && product.variants.length > 0 ? product.variants[0] : null
@@ -50,13 +53,13 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '18px',
-            right: '18px',
-            background: '#FFF9F6',
-            border: '1px solid rgba(0,0,0,0.1)',
+            top: '20px',
+            right: '20px',
+            background: '#FFF',
+            border: '1px solid #DDD',
             borderRadius: '50%',
-            width: '40px',
-            height: '40px',
+            width: '36px',
+            height: '36px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -81,25 +84,25 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               }}
             >
               <img 
-                src={product.images[activeImgIndex] || product.images[0]} 
-                alt={product.name}
+                src={images[activeImgIndex] || images[0]} 
+                alt={product.name || 'Luxury Product'}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Thumbnail Row */}
-            {product.images.length > 1 && (
+            {images.length > 1 && (
               <div style={{ display: 'flex', gap: '10px' }}>
-                {product.images.map((img, i) => (
+                {images.map((img, i) => (
                   <img
                     key={i}
                     src={img}
-                    alt=""
+                    alt="Product thumbnail"
                     onClick={() => setActiveImgIndex(i)}
                     style={{
                       width: '64px',
                       height: '64px',
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       objectFit: 'cover',
                       cursor: 'pointer',
                       border: activeImgIndex === i ? '2px solid #C8A45D' : '1px solid rgba(0,0,0,0.1)'

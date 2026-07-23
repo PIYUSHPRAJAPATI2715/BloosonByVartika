@@ -72,7 +72,7 @@ export default function Hero({ settings }) {
               marginBottom: '20px'
             }}
           >
-            {settings?.heroHeading ? (
+            {typeof settings?.heroHeading === 'string' && settings.heroHeading.trim().length > 0 ? (
               settings.heroHeading.includes('Story') ? (
                 <>
                   {settings.heroHeading.replace('Story', '')}
@@ -82,6 +82,7 @@ export default function Hero({ settings }) {
                 </>
               ) : settings.heroHeading
             ) : (
+
               <>
                 Every Gift <br />
                 <span className="title-blush-gradient" style={{ fontStyle: 'italic', fontWeight: 400 }}>
