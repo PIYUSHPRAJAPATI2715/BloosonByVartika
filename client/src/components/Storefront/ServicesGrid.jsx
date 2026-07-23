@@ -136,8 +136,9 @@ export default function ServicesGrid({ onSelectCategory }) {
             gap: '32px'
           }}
         >
-          {displayServices.map((service) => {
+          {services.map((service) => {
             const isHovered = hoveredCard === service.id;
+
 
             return (
               <div
