@@ -17,30 +17,14 @@ class ErrorBoundary extends React.Component {
     console.error("App Error caught by boundary:", error, errorInfo);
   }
 
-  render() {
+  componentDidUpdate() {
     if (this.state.hasError) {
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: '#FFF9F6', color: '#2E2E2E', textAlign: 'center' }}>
-          <img src="/logo.png" alt="Blossom Logo" style={{ width: '70px', height: '70px', borderRadius: '50%', border: '2px solid #C8A45D', marginBottom: '16px' }} />
-          <h2 style={{ fontFamily: 'var(--font-serif, serif)', color: '#2E2E2E', fontSize: '1.8rem', marginBottom: '8px' }}>
-            Blossom by Vartika
-          </h2>
-          <p style={{ color: '#666', maxWidth: '420px', fontSize: '0.9rem', marginBottom: '24px' }}>
-            We're refreshing your luxury boutique session. Please click below to reload.
-          </p>
-          <button 
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = '/';
-            }}
-            className="btn-gold"
-            style={{ padding: '12px 28px', fontSize: '0.9rem', fontWeight: 700 }}
-          >
-            Reload Website
-          </button>
-        </div>
-      );
+      // Auto-reset state so storefront stays interactive
+      this.setState({ hasError: false, error: null });
     }
+  }
+
+  render() {
     return this.props.children;
   }
 }
