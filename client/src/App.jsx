@@ -31,8 +31,14 @@ import AdminCalendar from './components/Admin/AdminCalendar';
 import AdminAiAssistant from './components/Admin/AdminAiAssistant';
 
 export default function App() {
-  // Navigation & Store State
-  const [activeAdmin, setActiveAdmin] = useState(false);
+  // Navigation & Store State (Persisted Admin Session)
+  const [activeAdmin, setActiveAdmin] = useState(() => {
+    try {
+      return localStorage.getItem('blossom_active_admin') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
   const [adminTab, setAdminTab] = useState('dashboard');
 
   // User Auth State
@@ -42,6 +48,7 @@ export default function App() {
   });
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('user');
+
 
   // Dynamic Settings State
   const [websiteSettings, setWebsiteSettings] = useState({
@@ -264,6 +271,7 @@ export default function App() {
 
     if (isAdmin) {
       setActiveAdmin(true);
+      localStorage.setItem('blossom_active_admin', 'true');
     }
   };
 
@@ -271,8 +279,15 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('blossom_user');
     localStorage.removeItem('blossom_token');
+    localStorage.removeItem('blossom_active_admin');
     setActiveAdmin(false);
   };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('blossom_active_admin');
+    setActiveAdmin(false);
+  };
+
 
   const handleAddToCart = (product, variantName = 'Standard', quantity = 1, customMsg = '') => {
     if (!currentUser) {
@@ -332,7 +347,9 @@ export default function App() {
           activeTab={adminTab} 
           onTabChange={setAdminTab} 
           onExitAdmin={() => setActiveAdmin(false)}
+          onLogoutAdmin={handleAdminLogout}
         >
+
           {adminTab === 'dashboard' && <AdminDashboard onNavigate={setAdminTab} />}
           {adminTab === 'orders' && <AdminOrders />}
           {adminTab === 'users' && <AdminUsers />}

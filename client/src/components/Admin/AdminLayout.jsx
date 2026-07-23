@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Gift, ShoppingBag, Box, Tag, Calendar, Sparkles, Store, ShieldCheck, FileText, Layers, Users, Sliders, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Gift, ShoppingBag, Box, Tag, Calendar, Sparkles, Store, ShieldCheck, FileText, Layers, Users, Sliders, Menu, X, LogOut } from 'lucide-react';
 
-export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, children }) {
+export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, onLogoutAdmin, children }) {
   const [mobileAdminOpen, setMobileAdminOpen] = useState(false);
 
   const menuItems = [
@@ -55,6 +55,9 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
           </button>
           <button onClick={onExitAdmin} style={{ background: '#C8A45D', color: '#1E1E1E', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
             Store
+          </button>
+          <button onClick={onLogoutAdmin} style={{ background: '#DC3545', color: '#FFF', border: 'none', borderRadius: '8px', padding: '6px 10px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            Logout
           </button>
         </div>
       </div>
@@ -137,8 +140,8 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
             </nav>
           </div>
 
-          {/* Footer Exit Button (Desktop) */}
-          <div className="desktop-only-admin-header" style={{ paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          {/* Footer Action Buttons (Desktop Sidebar) */}
+          <div className="desktop-only-admin-header" style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <button
               onClick={onExitAdmin}
               style={{
@@ -146,7 +149,7 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
-                padding: '12px 14px',
+                padding: '10px 14px',
                 borderRadius: '12px',
                 border: '1px solid rgba(200, 164, 93, 0.4)',
                 background: '#1E1E1E',
@@ -156,10 +159,31 @@ export default function AdminLayout({ activeTab, onTabChange, onExitAdmin, child
                 cursor: 'pointer'
               }}
             >
-              <Store size={18} color="#C8A45D" /> Back to Live Storefront
+              <Store size={18} color="#C8A45D" /> View Live Storefront
+            </button>
+
+            <button
+              onClick={onLogoutAdmin}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '12px',
+                border: '1px solid rgba(220, 53, 69, 0.6)',
+                background: 'rgba(220, 53, 69, 0.15)',
+                color: '#FF6B6B',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <LogOut size={18} color="#FF6B6B" /> Logout Admin Session
             </button>
           </div>
         </aside>
+
 
         {/* Content Body */}
         <main style={{ flex: 1, padding: '24px', overflowX: 'auto', background: '#1E1E1E', minWidth: 0 }}>
