@@ -6,8 +6,11 @@ import { uploadImage } from '../../config/upload';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+
   
   const [newCategory, setNewCategory] = useState({
     name: '',
