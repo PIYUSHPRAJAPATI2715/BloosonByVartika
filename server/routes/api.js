@@ -335,7 +335,7 @@ const sendAutomatedCustomerWhatsappMessage = async (orderData) => {
     const itemsText = orderData.items ? orderData.items.map(i => `• ${i.productName} (x${i.quantity || 1})`).join('\n') : 'Luxury Hamper Set';
     
     // Automated Message to Customer
-    const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://blooson-by-vartika.vercel.app/`;
+    const customerMsg = `🌸 *ORDER CONFIRMED - BLOSSOM BY VARTIKA* 🌸\n\nDear ${orderData.customerName},\nThank you for choosing Blossom by Vartika Jaipur!\n\nYour Order #${orderData.orderNumber} (Total Amount: ₹${orderData.totalAmount}) has been reserved.\n\nOur studio owner Vartika Gupta (+91 98280 23641) will personally call you shortly on ${orderData.customerPhone} to confirm hamper details and payment preferences.\n\nItems Reserved:\n${itemsText}\n\nTrack Live Order Status: https://bloosombyvartika.in/`;
 
     // Automated Message to Owner Numbers (919828023641 & 919549348495)
     const ownerMsg = `🌸 *NEW ORDER RESERVED - BLOSSOM BY VARTIKA* 🌸\n\nOrder #: ${orderData.orderNumber}\nClient: ${orderData.customerName}\nPhone: ${orderData.customerPhone}\nEmail: ${orderData.customerEmail || 'N/A'}\nAddress: ${orderData.shippingAddress}, ${orderData.city}\nTotal Amount: ₹${orderData.totalAmount}\n\nItems:\n${itemsText}`;
